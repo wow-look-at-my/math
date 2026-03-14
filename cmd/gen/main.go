@@ -25,6 +25,24 @@ var funcMap = template.FuncMap{
 	"param":     func(i int) string { return []string{"x", "y", "z", "w"}[i] },
 	"last":      func(i, n int) bool { return i == n-1 },
 	"join":      strings.Join,
+	"intList": func(count, start int) string {
+		parts := make([]string, count)
+		for i := range parts {
+			parts[i] = fmt.Sprintf("%d", start+i)
+		}
+		return strings.Join(parts, ", ")
+	},
+	"invMat": func(n int) string {
+		switch n {
+		case 2:
+			return "1, 2, 3, 4"
+		case 3:
+			return "1, 2, 3, 0, 1, 4, 5, 6, 0"
+		case 4:
+			return "1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1"
+		}
+		return ""
+	},
 }
 
 type vecData struct {
@@ -56,14 +74,15 @@ type itestData struct {
 }
 
 type benchData struct {
-	Prefix     string
-	ElemType   string
-	LenType    string
-	LerpT      string
-	HasApproxEq bool
-	HasFloat32  bool
-	HasMat3     bool
-	Epsilon    string
+	Prefix         string
+	ElemType       string
+	LenType        string
+	LerpT          string
+	HasVecApproxEq bool
+	HasMatApproxEq bool
+	HasFloat32     bool
+	HasMat3        bool
+	Epsilon        string
 }
 
 // genDir returns the directory containing this source file,
@@ -220,33 +239,46 @@ func main() {
 		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
 	)
 
-	// Float64 benchmarks.
-	if err := generateFile(benchTmpl, "d_bench_test.go", benchData{
-		Prefix:      "D",
-		ElemType:    "float64",
-		LenType:     "float64",
-		LerpT:       "0.5",
-		HasApproxEq: true,
-		HasFloat32:  true,
-		HasMat3:     true,
-		Epsilon:     "1e-10",
-	}); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+	benchTypes := []struct {
+		Prefix         string
+		ElemType       string
+		LenType        string
+		HasVecApproxEq bool
+		HasMatApproxEq bool
+		HasFloat32     bool
+		HasMat3        bool
+		Epsilon        string
+		Filename       string
+	}{
+		{"", "float32", "float32", true, false, false, true, "1e-6", "f32_bench_test.go"},
+		{"D", "float64", "float64", true, true, true, true, "1e-10", "d_bench_test.go"},
 	}
 
-	// Integer type benchmarks.
 	for _, it := range intTypes {
-		prefix := strings.ToLower(it.Prefix)
-		if err := generateFile(benchTmpl, fmt.Sprintf("%s_bench_test.go", prefix), benchData{
-			Prefix:      it.Prefix,
-			ElemType:    it.GoType,
-			LenType:     "float32",
-			LerpT:       "0.5",
-			HasApproxEq: false,
-			HasFloat32:  true,
-			HasMat3:     false,
-			Epsilon:     "",
+		benchTypes = append(benchTypes, struct {
+			Prefix         string
+			ElemType       string
+			LenType        string
+			HasVecApproxEq bool
+			HasMatApproxEq bool
+			HasFloat32     bool
+			HasMat3        bool
+			Epsilon        string
+			Filename       string
+		}{it.Prefix, it.GoType, "float32", false, false, true, false, "", strings.ToLower(it.Prefix) + "_bench_test.go"})
+	}
+
+	for _, bt := range benchTypes {
+		if err := generateFile(benchTmpl, bt.Filename, benchData{
+			Prefix:         bt.Prefix,
+			ElemType:       bt.ElemType,
+			LenType:        bt.LenType,
+			LerpT:          "0.5",
+			HasVecApproxEq: bt.HasVecApproxEq,
+			HasMatApproxEq: bt.HasMatApproxEq,
+			HasFloat32:     bt.HasFloat32,
+			HasMat3:        bt.HasMat3,
+			Epsilon:        bt.Epsilon,
 		}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)

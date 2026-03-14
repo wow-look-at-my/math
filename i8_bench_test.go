@@ -43,7 +43,7 @@ func BenchmarkI8Vec2Dot(b *testing.B) {
 }
 
 func BenchmarkI8Vec2LenSq(b *testing.B) {
-	a := NewI8Vec2(3, 4)
+	a := NewI8Vec2(1, 2)
 	var r int8
 	for b.Loop() {
 		r = a.LenSq()
@@ -52,7 +52,7 @@ func BenchmarkI8Vec2LenSq(b *testing.B) {
 }
 
 func BenchmarkI8Vec2Len(b *testing.B) {
-	a := NewI8Vec2(3, 4)
+	a := NewI8Vec2(1, 2)
 	var r float32
 	for b.Loop() {
 		r = a.Len()
@@ -61,7 +61,7 @@ func BenchmarkI8Vec2Len(b *testing.B) {
 }
 
 func BenchmarkI8Vec2Normalize(b *testing.B) {
-	a := NewI8Vec2(3, 4)
+	a := NewI8Vec2(1, 2)
 	v := a.Normalize()
 	for b.Loop() {
 		v = a.Normalize()
@@ -81,7 +81,7 @@ func BenchmarkI8Vec2Lerp(b *testing.B) {
 
 func BenchmarkI8Vec2Dist(b *testing.B) {
 	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(4, 6)
+	c := NewI8Vec2(3, 4)
 	var r float32
 	for b.Loop() {
 		r = a.Dist(c)
@@ -144,15 +144,6 @@ func BenchmarkI8Vec3Dot(b *testing.B) {
 		r = a.Dot(c)
 	}
 	_ = r
-}
-
-func BenchmarkI8Vec3Cross(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Cross(c)
-	}
-	_ = a
 }
 
 func BenchmarkI8Vec3LenSq(b *testing.B) {
@@ -219,6 +210,15 @@ func BenchmarkI8Vec3Float32(b *testing.B) {
 		r = a.Float32()
 	}
 	_ = r
+}
+
+func BenchmarkI8Vec3Cross(b *testing.B) {
+	a := NewI8Vec3(1, 2, 3)
+	c := NewI8Vec3(4, 5, 6)
+	for b.Loop() {
+		a = a.Cross(c)
+	}
+	_ = a
 }
 
 func BenchmarkI8Vec3XY(b *testing.B) {
@@ -391,7 +391,7 @@ func BenchmarkI8Mat2Mul(b *testing.B) {
 
 func BenchmarkI8Mat2MulVec2(b *testing.B) {
 	m := NewI8Mat2(1, 2, 3, 4)
-	v := NewI8Vec2(5, 6)
+	v := NewI8Vec2(1, 2)
 	for b.Loop() {
 		v = m.MulVec2(v)
 	}
@@ -447,7 +447,7 @@ func BenchmarkI8Mat2Float32(b *testing.B) {
 
 func BenchmarkI8Mat3Add(b *testing.B) {
 	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -456,7 +456,7 @@ func BenchmarkI8Mat3Add(b *testing.B) {
 
 func BenchmarkI8Mat3Sub(b *testing.B) {
 	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -473,7 +473,7 @@ func BenchmarkI8Mat3Scale(b *testing.B) {
 
 func BenchmarkI8Mat3Mul(b *testing.B) {
 	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Mul(c)
 	}
@@ -538,7 +538,7 @@ func BenchmarkI8Mat3Float32(b *testing.B) {
 
 func BenchmarkI8Mat4Add(b *testing.B) {
 	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -547,7 +547,7 @@ func BenchmarkI8Mat4Add(b *testing.B) {
 
 func BenchmarkI8Mat4Sub(b *testing.B) {
 	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -564,7 +564,7 @@ func BenchmarkI8Mat4Scale(b *testing.B) {
 
 func BenchmarkI8Mat4Mul(b *testing.B) {
 	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Mul(c)
 	}

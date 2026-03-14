@@ -43,7 +43,7 @@ func BenchmarkDVec2Dot(b *testing.B) {
 }
 
 func BenchmarkDVec2LenSq(b *testing.B) {
-	a := NewDVec2(3, 4)
+	a := NewDVec2(1, 2)
 	var r float64
 	for b.Loop() {
 		r = a.LenSq()
@@ -52,7 +52,7 @@ func BenchmarkDVec2LenSq(b *testing.B) {
 }
 
 func BenchmarkDVec2Len(b *testing.B) {
-	a := NewDVec2(3, 4)
+	a := NewDVec2(1, 2)
 	var r float64
 	for b.Loop() {
 		r = a.Len()
@@ -61,7 +61,7 @@ func BenchmarkDVec2Len(b *testing.B) {
 }
 
 func BenchmarkDVec2Normalize(b *testing.B) {
-	a := NewDVec2(3, 4)
+	a := NewDVec2(1, 2)
 	v := a.Normalize()
 	for b.Loop() {
 		v = a.Normalize()
@@ -81,7 +81,7 @@ func BenchmarkDVec2Lerp(b *testing.B) {
 
 func BenchmarkDVec2Dist(b *testing.B) {
 	a := NewDVec2(1, 2)
-	c := NewDVec2(4, 6)
+	c := NewDVec2(3, 4)
 	var r float64
 	for b.Loop() {
 		r = a.Dist(c)
@@ -154,15 +154,6 @@ func BenchmarkDVec3Dot(b *testing.B) {
 		r = a.Dot(c)
 	}
 	_ = r
-}
-
-func BenchmarkDVec3Cross(b *testing.B) {
-	a := NewDVec3(1, 2, 3)
-	c := NewDVec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Cross(c)
-	}
-	_ = a
 }
 
 func BenchmarkDVec3LenSq(b *testing.B) {
@@ -239,6 +230,15 @@ func BenchmarkDVec3Float32(b *testing.B) {
 		r = a.Float32()
 	}
 	_ = r
+}
+
+func BenchmarkDVec3Cross(b *testing.B) {
+	a := NewDVec3(1, 2, 3)
+	c := NewDVec3(4, 5, 6)
+	for b.Loop() {
+		a = a.Cross(c)
+	}
+	_ = a
 }
 
 func BenchmarkDVec3XY(b *testing.B) {
@@ -421,7 +421,7 @@ func BenchmarkDMat2Mul(b *testing.B) {
 
 func BenchmarkDMat2MulVec2(b *testing.B) {
 	m := NewDMat2(1, 2, 3, 4)
-	v := NewDVec2(5, 6)
+	v := NewDVec2(1, 2)
 	for b.Loop() {
 		v = m.MulVec2(v)
 	}
@@ -487,7 +487,7 @@ func BenchmarkDMat2Float32(b *testing.B) {
 
 func BenchmarkDMat3Add(b *testing.B) {
 	a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewDMat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -496,7 +496,7 @@ func BenchmarkDMat3Add(b *testing.B) {
 
 func BenchmarkDMat3Sub(b *testing.B) {
 	a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewDMat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -513,7 +513,7 @@ func BenchmarkDMat3Scale(b *testing.B) {
 
 func BenchmarkDMat3Mul(b *testing.B) {
 	a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewDMat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Mul(c)
 	}
@@ -588,7 +588,7 @@ func BenchmarkDMat3Float32(b *testing.B) {
 
 func BenchmarkDMat4Add(b *testing.B) {
 	a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewDMat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -597,7 +597,7 @@ func BenchmarkDMat4Add(b *testing.B) {
 
 func BenchmarkDMat4Sub(b *testing.B) {
 	a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewDMat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -614,7 +614,7 @@ func BenchmarkDMat4Scale(b *testing.B) {
 
 func BenchmarkDMat4Mul(b *testing.B) {
 	a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewDMat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Mul(c)
 	}

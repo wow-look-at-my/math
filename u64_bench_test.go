@@ -43,7 +43,7 @@ func BenchmarkU64Vec2Dot(b *testing.B) {
 }
 
 func BenchmarkU64Vec2LenSq(b *testing.B) {
-	a := NewU64Vec2(3, 4)
+	a := NewU64Vec2(1, 2)
 	var r uint64
 	for b.Loop() {
 		r = a.LenSq()
@@ -52,7 +52,7 @@ func BenchmarkU64Vec2LenSq(b *testing.B) {
 }
 
 func BenchmarkU64Vec2Len(b *testing.B) {
-	a := NewU64Vec2(3, 4)
+	a := NewU64Vec2(1, 2)
 	var r float32
 	for b.Loop() {
 		r = a.Len()
@@ -61,7 +61,7 @@ func BenchmarkU64Vec2Len(b *testing.B) {
 }
 
 func BenchmarkU64Vec2Normalize(b *testing.B) {
-	a := NewU64Vec2(3, 4)
+	a := NewU64Vec2(1, 2)
 	v := a.Normalize()
 	for b.Loop() {
 		v = a.Normalize()
@@ -81,7 +81,7 @@ func BenchmarkU64Vec2Lerp(b *testing.B) {
 
 func BenchmarkU64Vec2Dist(b *testing.B) {
 	a := NewU64Vec2(1, 2)
-	c := NewU64Vec2(4, 6)
+	c := NewU64Vec2(3, 4)
 	var r float32
 	for b.Loop() {
 		r = a.Dist(c)
@@ -144,15 +144,6 @@ func BenchmarkU64Vec3Dot(b *testing.B) {
 		r = a.Dot(c)
 	}
 	_ = r
-}
-
-func BenchmarkU64Vec3Cross(b *testing.B) {
-	a := NewU64Vec3(1, 2, 3)
-	c := NewU64Vec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Cross(c)
-	}
-	_ = a
 }
 
 func BenchmarkU64Vec3LenSq(b *testing.B) {
@@ -219,6 +210,15 @@ func BenchmarkU64Vec3Float32(b *testing.B) {
 		r = a.Float32()
 	}
 	_ = r
+}
+
+func BenchmarkU64Vec3Cross(b *testing.B) {
+	a := NewU64Vec3(1, 2, 3)
+	c := NewU64Vec3(4, 5, 6)
+	for b.Loop() {
+		a = a.Cross(c)
+	}
+	_ = a
 }
 
 func BenchmarkU64Vec3XY(b *testing.B) {
@@ -391,7 +391,7 @@ func BenchmarkU64Mat2Mul(b *testing.B) {
 
 func BenchmarkU64Mat2MulVec2(b *testing.B) {
 	m := NewU64Mat2(1, 2, 3, 4)
-	v := NewU64Vec2(5, 6)
+	v := NewU64Vec2(1, 2)
 	for b.Loop() {
 		v = m.MulVec2(v)
 	}
@@ -447,7 +447,7 @@ func BenchmarkU64Mat2Float32(b *testing.B) {
 
 func BenchmarkU64Mat3Add(b *testing.B) {
 	a := NewU64Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewU64Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -456,7 +456,7 @@ func BenchmarkU64Mat3Add(b *testing.B) {
 
 func BenchmarkU64Mat3Sub(b *testing.B) {
 	a := NewU64Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewU64Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -473,7 +473,7 @@ func BenchmarkU64Mat3Scale(b *testing.B) {
 
 func BenchmarkU64Mat3Mul(b *testing.B) {
 	a := NewU64Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewU64Mat3(9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
 	for b.Loop() {
 		a = a.Mul(c)
 	}
@@ -538,7 +538,7 @@ func BenchmarkU64Mat3Float32(b *testing.B) {
 
 func BenchmarkU64Mat4Add(b *testing.B) {
 	a := NewU64Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewU64Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Add(c)
 	}
@@ -547,7 +547,7 @@ func BenchmarkU64Mat4Add(b *testing.B) {
 
 func BenchmarkU64Mat4Sub(b *testing.B) {
 	a := NewU64Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewU64Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Sub(c)
 	}
@@ -564,7 +564,7 @@ func BenchmarkU64Mat4Scale(b *testing.B) {
 
 func BenchmarkU64Mat4Mul(b *testing.B) {
 	a := NewU64Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewU64Mat4(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+	c := NewU64Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
 	for b.Loop() {
 		a = a.Mul(c)
 	}
