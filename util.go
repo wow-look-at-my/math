@@ -2,7 +2,7 @@ package math
 
 import "math"
 
-func abs[T Float](x T) T {
+func abs[T Numeric](x T) T {
 	if x < 0 {
 		return -x
 	}
@@ -26,7 +26,7 @@ func tan[T Float](x T) T {
 }
 
 // Clamp returns x clamped to [min, max].
-func Clamp[T Float](x, min, max T) T {
+func Clamp[T Numeric](x, min, max T) T {
 	if x < min {
 		return min
 	}

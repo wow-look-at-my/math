@@ -2,103 +2,204 @@
 
 package math
 
-// TMat2 is a 2x2 matrix in column-major order.
-type TMat2[T Float] [4]T
-
-// Mat2 is a TMat2 of float32.
-type Mat2 = TMat2[float32]
+// TMat2 is a generic 2x2 matrix in column-major order.
+type TMat2[T Numeric] struct {
+	Data [4]T
+}
 
 // NewTMat2 creates a 2x2 matrix from row-major arguments.
-func NewTMat2[T Float](
+func NewTMat2[T Numeric](
 	m00, m01 T,
 	m10, m11 T,
 ) TMat2[T] {
-	return TMat2[T]{
+	return TMat2[T]{Data: [4]T{
 		m00, m10, // col 0
 		m01, m11, // col 1
-	}
-}
-
-func NewMat2(
-	m00, m01 float32,
-	m10, m11 float32,
-) Mat2 {
-	return NewTMat2(m00, m01, m10, m11)
-}
-
-func Mat2Identity() Mat2 {
-	return NewMat2(1, 0, 0, 1)
+	}}
 }
 
 func (m TMat2[T]) Col(c int) TVec2[T] {
 	i := c * 2
-	return TVec2[T]{m[i+0], m[i+1]}
+	return TVec2[T]{X: m.Data[i+0], Y: m.Data[i+1]}
 }
 
 func (m TMat2[T]) Row(r int) TVec2[T] {
-	return TVec2[T]{m[r+0], m[r+2]}
+	return TVec2[T]{X: m.Data[r+0], Y: m.Data[r+2]}
 }
 
 func (m TMat2[T]) At(row, col int) T {
-	return m[col*2+row]
+	return m.Data[col*2+row]
 }
 
 func (a TMat2[T]) Add(b TMat2[T]) TMat2[T] {
 	var out TMat2[T]
-	for i := range out {
-		out[i] = a[i] + b[i]
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] + b.Data[i]
 	}
 	return out
 }
 
 func (a TMat2[T]) Sub(b TMat2[T]) TMat2[T] {
 	var out TMat2[T]
-	for i := range out {
-		out[i] = a[i] - b[i]
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] - b.Data[i]
 	}
 	return out
 }
 
 func (m TMat2[T]) Scale(s T) TMat2[T] {
 	var out TMat2[T]
-	for i := range out {
-		out[i] = m[i] * s
+	for i := range out.Data {
+		out.Data[i] = m.Data[i] * s
 	}
 	return out
 }
 
 func (a TMat2[T]) Mul(b TMat2[T]) TMat2[T] {
-	return NewTMat2(
-		a.Row(0).Dot(b.Col(0)), a.Row(0).Dot(b.Col(1)),
-		a.Row(1).Dot(b.Col(0)), a.Row(1).Dot(b.Col(1)),
-	)
+	var out TMat2[T]
+	for c := 0; c < 2; c++ {
+		bc := b.Col(c)
+		for r := 0; r < 2; r++ {
+			out.Data[c*2+r] = a.Row(r).Dot(bc)
+		}
+	}
+	return out
 }
+
 func (m TMat2[T]) MulVec2(v TVec2[T]) TVec2[T] {
 	return TVec2[T]{
-		m.Row(0).Dot(v),
-		m.Row(1).Dot(v),
+		X: m.Row(0).Dot(v),
+		Y: m.Row(1).Dot(v),
 	}
 }
 
 func (m TMat2[T]) Transpose() TMat2[T] {
-	return NewTMat2(
-		m.At(0, 0), m.At(1, 0),
-		m.At(0, 1), m.At(1, 1),
-	)
+	var out TMat2[T]
+	for r := 0; r < 2; r++ {
+		for c := 0; c < 2; c++ {
+			out.Data[c*2+r] = m.Data[r*2+c]
+		}
+	}
+	return out
 }
 
 func (m TMat2[T]) Det() T {
-	return m[0]*m[3] - m[2]*m[1]
+	return m.Data[0]*m.Data[3] - m.Data[2]*m.Data[1]
+}
+func (a TMat2[T]) Eq(b TMat2[T]) bool {
+	for i := range a.Data {
+		if a.Data[i] != b.Data[i] {
+			return false
+		}
+	}
+	return true
 }
 
-func (m TMat2[T]) Inverse() TMat2[T] {
+// Mat2 is a 2x2 float32 matrix in column-major order.
+type Mat2 struct {
+	Data [4]float32
+}
+
+// NewMat2 creates a 2x2 matrix from row-major arguments.
+func NewMat2(
+	m00, m01 float32,
+	m10, m11 float32,
+) Mat2 {
+	return Mat2{Data: [4]float32{
+		m00, m10, // col 0
+		m01, m11, // col 1
+	}}
+}
+
+func Mat2Identity() Mat2 {
+	return NewMat2(1, 0, 0, 1)
+}
+
+func (m Mat2) Col(c int) Vec2 {
+	i := c * 2
+	return Vec2{X: m.Data[i+0], Y: m.Data[i+1]}
+}
+
+func (m Mat2) Row(r int) Vec2 {
+	return Vec2{X: m.Data[r+0], Y: m.Data[r+2]}
+}
+
+func (m Mat2) At(row, col int) float32 {
+	return m.Data[col*2+row]
+}
+
+func (a Mat2) Add(b Mat2) Mat2 {
+	var out Mat2
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] + b.Data[i]
+	}
+	return out
+}
+
+func (a Mat2) Sub(b Mat2) Mat2 {
+	var out Mat2
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] - b.Data[i]
+	}
+	return out
+}
+
+func (m Mat2) Scale(s float32) Mat2 {
+	var out Mat2
+	for i := range out.Data {
+		out.Data[i] = m.Data[i] * s
+	}
+	return out
+}
+
+func (a Mat2) Mul(b Mat2) Mat2 {
+	var out Mat2
+	for c := 0; c < 2; c++ {
+		bc := b.Col(c)
+		for r := 0; r < 2; r++ {
+			out.Data[c*2+r] = a.Row(r).Dot(bc)
+		}
+	}
+	return out
+}
+
+func (m Mat2) MulVec2(v Vec2) Vec2 {
+	return Vec2{
+		X: m.Row(0).Dot(v),
+		Y: m.Row(1).Dot(v),
+	}
+}
+
+func (m Mat2) Transpose() Mat2 {
+	var out Mat2
+	for r := 0; r < 2; r++ {
+		for c := 0; c < 2; c++ {
+			out.Data[c*2+r] = m.Data[r*2+c]
+		}
+	}
+	return out
+}
+
+func (m Mat2) Det() float32 {
+	return m.Data[0]*m.Data[3] - m.Data[2]*m.Data[1]
+}
+
+func (m Mat2) Inverse() Mat2 {
 	d := m.Det()
 	if d == 0 {
-		return TMat2[T]{}
+		return Mat2{}
 	}
 	invD := 1.0 / d
-	return TMat2[T]{
-		m[3] * invD, -m[1] * invD,
-		-m[2] * invD, m[0] * invD,
+	return Mat2{Data: [4]float32{
+		m.Data[3] * invD, -m.Data[1] * invD,
+		-m.Data[2] * invD, m.Data[0] * invD,
+	}}
+}
+func (a Mat2) Eq(b Mat2) bool {
+	for i := range a.Data {
+		if a.Data[i] != b.Data[i] {
+			return false
+		}
 	}
+	return true
 }

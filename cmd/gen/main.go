@@ -36,6 +36,19 @@ type matData struct {
 	N2 int
 }
 
+type ivecData struct {
+	N        int
+	Prefix   string
+	ElemType string
+}
+
+type imatData struct {
+	N        int
+	N2       int
+	Prefix   string
+	ElemType string
+}
+
 // genDir returns the directory containing this source file,
 // which is where the .tmpl files live.
 func genDir() string {
@@ -71,7 +84,14 @@ func main() {
 	matTmpl := template.Must(
 		template.New("mat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "mat.go.tmpl")),
 	)
+	ivecTmpl := template.Must(
+		template.New("ivec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ivec.go.tmpl")),
+	)
+	imatTmpl := template.Must(
+		template.New("imat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "imat.go.tmpl")),
+	)
 
+	// Generate generic + float concrete types.
 	for _, n := range []int{2, 3, 4} {
 		if err := generateFile(vecTmpl, fmt.Sprintf("vec%d.go", n), vecData{N: n}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -83,6 +103,45 @@ func main() {
 		if err := generateFile(matTmpl, fmt.Sprintf("mat%d.go", n), matData{N: n, N2: n * n}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
+		}
+	}
+
+	// Generate integer concrete types.
+	intTypes := []struct {
+		Prefix string
+		GoType string
+	}{
+		{"I8", "int8"},
+		{"I16", "int16"},
+		{"I32", "int32"},
+		{"I64", "int64"},
+		{"U8", "uint8"},
+		{"U16", "uint16"},
+		{"U32", "uint32"},
+		{"U64", "uint64"},
+	}
+
+	for _, it := range intTypes {
+		prefix := strings.ToLower(it.Prefix)
+		for _, n := range []int{2, 3, 4} {
+			if err := generateFile(ivecTmpl, fmt.Sprintf("%svec%d.go", prefix, n), ivecData{
+				N:        n,
+				Prefix:   it.Prefix,
+				ElemType: it.GoType,
+			}); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+
+			if err := generateFile(imatTmpl, fmt.Sprintf("%smat%d.go", prefix, n), imatData{
+				N:        n,
+				N2:       n * n,
+				Prefix:   it.Prefix,
+				ElemType: it.GoType,
+			}); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
 		}
 	}
 }
