@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // I8Vec3 is a 3-component int8 vector.
 type I8Vec3 struct {
@@ -97,4 +100,19 @@ func (v I8Vec3) Float32() Vec3 {
 
 func (v I8Vec3) XY() I8Vec2 {
 	return I8Vec2{X: v.X, Y: v.Y}
+}
+
+func (v I8Vec3) MarshalJSON() ([]byte, error) {
+	return json.Marshal([3]int8{v.X, v.Y, v.Z})
+}
+
+func (v *I8Vec3) UnmarshalJSON(data []byte) error {
+	var arr [3]int8
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	return nil
 }

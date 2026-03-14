@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // Vec2 is a 2-component float32 vector.
 type Vec2 struct {
@@ -69,4 +72,18 @@ func (a Vec2) Eq(b Vec2) bool {
 
 func (a Vec2) ApproxEq(b Vec2, eps float32) bool {
 	return abs(a.X-b.X) <= eps && abs(a.Y-b.Y) <= eps
+}
+
+func (v Vec2) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]float32{v.X, v.Y})
+}
+
+func (v *Vec2) UnmarshalJSON(data []byte) error {
+	var arr [2]float32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	return nil
 }

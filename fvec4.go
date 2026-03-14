@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // Vec4 is a 4-component float32 vector.
 type Vec4 struct {
@@ -85,4 +88,20 @@ func (v Vec4) XY() Vec2 {
 
 func (v Vec4) XYZ() Vec3 {
 	return Vec3{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+func (v Vec4) MarshalJSON() ([]byte, error) {
+	return json.Marshal([4]float32{v.X, v.Y, v.Z, v.W})
+}
+
+func (v *Vec4) UnmarshalJSON(data []byte) error {
+	var arr [4]float32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	v.W = arr[3]
+	return nil
 }

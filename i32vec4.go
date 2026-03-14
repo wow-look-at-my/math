@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // I32Vec4 is a 4-component int32 vector.
 type I32Vec4 struct {
@@ -100,4 +103,20 @@ func (v I32Vec4) XY() I32Vec2 {
 
 func (v I32Vec4) XYZ() I32Vec3 {
 	return I32Vec3{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+func (v I32Vec4) MarshalJSON() ([]byte, error) {
+	return json.Marshal([4]int32{v.X, v.Y, v.Z, v.W})
+}
+
+func (v *I32Vec4) UnmarshalJSON(data []byte) error {
+	var arr [4]int32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	v.W = arr[3]
+	return nil
 }

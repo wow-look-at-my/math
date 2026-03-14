@@ -2,6 +2,8 @@
 
 package math
 
+import "encoding/json"
+
 // TVec2 is a generic 2-component vector.
 type TVec2[T Numeric] struct {
 	X T
@@ -39,4 +41,18 @@ func (v TVec2[T]) LenSq() T {
 
 func (a TVec2[T]) Eq(b TVec2[T]) bool {
 	return a.X == b.X && a.Y == b.Y
+}
+
+func (v TVec2[T]) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]T{v.X, v.Y})
+}
+
+func (v *TVec2[T]) UnmarshalJSON(data []byte) error {
+	var arr [2]T
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	return nil
 }

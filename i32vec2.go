@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // I32Vec2 is a 2-component int32 vector.
 type I32Vec2 struct {
@@ -78,4 +81,18 @@ func (v I32Vec2) Float32() Vec2 {
 		X: float32(v.X),
 		Y: float32(v.Y),
 	}
+}
+
+func (v I32Vec2) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]int32{v.X, v.Y})
+}
+
+func (v *I32Vec2) UnmarshalJSON(data []byte) error {
+	var arr [2]int32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	return nil
 }

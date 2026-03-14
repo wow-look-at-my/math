@@ -2,6 +2,8 @@
 
 package math
 
+import "encoding/json"
+
 // TVec{{.N}} is a generic {{.N}}-component vector.
 type TVec{{.N}}[T Numeric] struct {
 {{- range $i := seq .N}}
@@ -67,3 +69,17 @@ func (v TVec4[T]) XYZ() TVec3[T] {
 }
 
 {{end -}}
+func (v TVec{{.N}}[T]) MarshalJSON() ([]byte, error) {
+	return json.Marshal([{{.N}}]T{ {{- range $i := seq .N}}{{if $i}}, {{end}}v.{{component $i}}{{end -}} })
+}
+
+func (v *TVec{{.N}}[T]) UnmarshalJSON(data []byte) error {
+	var arr [{{.N}}]T
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+{{- range $i := seq .N}}
+	v.{{component $i}} = arr[{{$i}}]
+{{- end}}
+	return nil
+}

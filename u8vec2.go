@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // U8Vec2 is a 2-component uint8 vector.
 type U8Vec2 struct {
@@ -78,4 +81,18 @@ func (v U8Vec2) Float32() Vec2 {
 		X: float32(v.X),
 		Y: float32(v.Y),
 	}
+}
+
+func (v U8Vec2) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]uint8{v.X, v.Y})
+}
+
+func (v *U8Vec2) UnmarshalJSON(data []byte) error {
+	var arr [2]uint8
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	return nil
 }

@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // U32Vec4 is a 4-component uint32 vector.
 type U32Vec4 struct {
@@ -100,4 +103,20 @@ func (v U32Vec4) XY() U32Vec2 {
 
 func (v U32Vec4) XYZ() U32Vec3 {
 	return U32Vec3{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+func (v U32Vec4) MarshalJSON() ([]byte, error) {
+	return json.Marshal([4]uint32{v.X, v.Y, v.Z, v.W})
+}
+
+func (v *U32Vec4) UnmarshalJSON(data []byte) error {
+	var arr [4]uint32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	v.W = arr[3]
+	return nil
 }

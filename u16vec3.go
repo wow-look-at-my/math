@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // U16Vec3 is a 3-component uint16 vector.
 type U16Vec3 struct {
@@ -97,4 +100,19 @@ func (v U16Vec3) Float32() Vec3 {
 
 func (v U16Vec3) XY() U16Vec2 {
 	return U16Vec2{X: v.X, Y: v.Y}
+}
+
+func (v U16Vec3) MarshalJSON() ([]byte, error) {
+	return json.Marshal([3]uint16{v.X, v.Y, v.Z})
+}
+
+func (v *U16Vec3) UnmarshalJSON(data []byte) error {
+	var arr [3]uint16
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	return nil
 }

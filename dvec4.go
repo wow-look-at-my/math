@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // DVec4 is a 4-component float64 vector.
 type DVec4 struct {
@@ -94,4 +97,20 @@ func (v DVec4) XY() DVec2 {
 
 func (v DVec4) XYZ() DVec3 {
 	return DVec3{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+func (v DVec4) MarshalJSON() ([]byte, error) {
+	return json.Marshal([4]float64{v.X, v.Y, v.Z, v.W})
+}
+
+func (v *DVec4) UnmarshalJSON(data []byte) error {
+	var arr [4]float64
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	v.W = arr[3]
+	return nil
 }
