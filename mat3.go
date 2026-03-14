@@ -1,0 +1,124 @@
+package math
+
+// TMat3 is a 3x3 matrix in column-major order.
+type TMat3[T Float] [9]T
+
+// Mat3 is a TMat3 of float32.
+type Mat3 = TMat3[float32]
+
+// NewTMat3 creates a 3x3 matrix from row-major arguments.
+func NewTMat3[T Float](
+	m00, m01, m02 T,
+	m10, m11, m12 T,
+	m20, m21, m22 T,
+) TMat3[T] {
+	return TMat3[T]{
+		m00, m10, m20, // col 0
+		m01, m11, m21, // col 1
+		m02, m12, m22, // col 2
+	}
+}
+
+func NewMat3(
+	m00, m01, m02 float32,
+	m10, m11, m12 float32,
+	m20, m21, m22 float32,
+) Mat3 {
+	return NewTMat3(m00, m01, m02, m10, m11, m12, m20, m21, m22)
+}
+
+func Mat3Identity() Mat3 {
+	return NewMat3(1, 0, 0, 0, 1, 0, 0, 0, 1)
+}
+
+func (m TMat3[T]) Col(c int) TVec3[T] {
+	i := c * 3
+	return TVec3[T]{m[i], m[i+1], m[i+2]}
+}
+
+func (m TMat3[T]) Row(r int) TVec3[T] {
+	return TVec3[T]{m[r], m[r+3], m[r+6]}
+}
+
+func (m TMat3[T]) At(row, col int) T {
+	return m[col*3+row]
+}
+
+func (a TMat3[T]) Add(b TMat3[T]) TMat3[T] {
+	var out TMat3[T]
+	for i := range out {
+		out[i] = a[i] + b[i]
+	}
+	return out
+}
+
+func (a TMat3[T]) Sub(b TMat3[T]) TMat3[T] {
+	var out TMat3[T]
+	for i := range out {
+		out[i] = a[i] - b[i]
+	}
+	return out
+}
+
+func (m TMat3[T]) Scale(s T) TMat3[T] {
+	var out TMat3[T]
+	for i := range out {
+		out[i] = m[i] * s
+	}
+	return out
+}
+
+func (a TMat3[T]) Mul(b TMat3[T]) TMat3[T] {
+	var out TMat3[T]
+	for c := 0; c < 3; c++ {
+		bc := b.Col(c)
+		for r := 0; r < 3; r++ {
+			out[c*3+r] = a.Row(r).Dot(bc)
+		}
+	}
+	return out
+}
+
+func (m TMat3[T]) MulVec3(v TVec3[T]) TVec3[T] {
+	return TVec3[T]{
+		m.Row(0).Dot(v),
+		m.Row(1).Dot(v),
+		m.Row(2).Dot(v),
+	}
+}
+
+func (m TMat3[T]) Transpose() TMat3[T] {
+	return NewTMat3(
+		m.At(0, 0), m.At(1, 0), m.At(2, 0),
+		m.At(0, 1), m.At(1, 1), m.At(2, 1),
+		m.At(0, 2), m.At(1, 2), m.At(2, 2),
+	)
+}
+
+func (m TMat3[T]) Det() T {
+	return m.At(0, 0)*(m.At(1, 1)*m.At(2, 2)-m.At(1, 2)*m.At(2, 1)) -
+		m.At(0, 1)*(m.At(1, 0)*m.At(2, 2)-m.At(1, 2)*m.At(2, 0)) +
+		m.At(0, 2)*(m.At(1, 0)*m.At(2, 1)-m.At(1, 1)*m.At(2, 0))
+}
+
+func (m TMat3[T]) Inverse() TMat3[T] {
+	d := m.Det()
+	if d == 0 {
+		return TMat3[T]{}
+	}
+	invD := 1.0 / d
+
+	return NewTMat3(
+		(m.At(1, 1)*m.At(2, 2)-m.At(1, 2)*m.At(2, 1))*invD,
+		(m.At(0, 2)*m.At(2, 1)-m.At(0, 1)*m.At(2, 2))*invD,
+		(m.At(0, 1)*m.At(1, 2)-m.At(0, 2)*m.At(1, 1))*invD,
+
+		(m.At(1, 2)*m.At(2, 0)-m.At(1, 0)*m.At(2, 2))*invD,
+		(m.At(0, 0)*m.At(2, 2)-m.At(0, 2)*m.At(2, 0))*invD,
+		(m.At(0, 2)*m.At(1, 0)-m.At(0, 0)*m.At(1, 2))*invD,
+
+		(m.At(1, 0)*m.At(2, 1)-m.At(1, 1)*m.At(2, 0))*invD,
+		(m.At(0, 1)*m.At(2, 0)-m.At(0, 0)*m.At(2, 1))*invD,
+		(m.At(0, 0)*m.At(1, 1)-m.At(0, 1)*m.At(1, 0))*invD,
+	)
+}

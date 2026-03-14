@@ -1,0 +1,73 @@
+package math
+
+// TVec4 is a 4-component vector.
+type TVec4[T Float] [4]T
+
+// Vec4 is a TVec4 of float32.
+type Vec4 = TVec4[float32]
+
+func NewVec4(x, y, z, w float32) Vec4 {
+	return Vec4{x, y, z, w}
+}
+
+func (v TVec4[T]) X() T { return v[0] }
+func (v TVec4[T]) Y() T { return v[1] }
+func (v TVec4[T]) Z() T { return v[2] }
+func (v TVec4[T]) W() T { return v[3] }
+
+func (a TVec4[T]) Add(b TVec4[T]) TVec4[T] {
+	return TVec4[T]{a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]}
+}
+
+func (a TVec4[T]) Sub(b TVec4[T]) TVec4[T] {
+	return TVec4[T]{a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]}
+}
+
+func (v TVec4[T]) Scale(s T) TVec4[T] {
+	return TVec4[T]{v[0] * s, v[1] * s, v[2] * s, v[3] * s}
+}
+
+func (a TVec4[T]) Dot(b TVec4[T]) T {
+	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3]
+}
+
+func (v TVec4[T]) Len() T {
+	return sqrt(v.Dot(v))
+}
+
+func (v TVec4[T]) LenSq() T {
+	return v.Dot(v)
+}
+
+func (v TVec4[T]) Normalize() TVec4[T] {
+	l := v.Len()
+	if l == 0 {
+		return TVec4[T]{}
+	}
+	return v.Scale(1.0 / l)
+}
+
+func (a TVec4[T]) Lerp(b TVec4[T], t T) TVec4[T] {
+	return a.Add(b.Sub(a).Scale(t))
+}
+
+func (a TVec4[T]) Dist(b TVec4[T]) T {
+	return a.Sub(b).Len()
+}
+
+func (a TVec4[T]) Eq(b TVec4[T]) bool {
+	return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]
+}
+
+func (a TVec4[T]) ApproxEq(b TVec4[T], eps T) bool {
+	return abs(a[0]-b[0]) <= eps && abs(a[1]-b[1]) <= eps &&
+		abs(a[2]-b[2]) <= eps && abs(a[3]-b[3]) <= eps
+}
+
+func (v TVec4[T]) XYZ() TVec3[T] {
+	return TVec3[T]{v[0], v[1], v[2]}
+}
+
+func (v TVec4[T]) XY() TVec2[T] {
+	return TVec2[T]{v[0], v[1]}
+}
