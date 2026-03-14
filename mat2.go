@@ -203,3 +203,12 @@ func (a Mat2) Eq(b Mat2) bool {
 	}
 	return true
 }
+
+func (a Mat2) ApproxEq(b Mat2, eps float32) bool {
+	for i := range a.Data {
+		if abs(a.Data[i]-b.Data[i]) > eps {
+			return false
+		}
+	}
+	return true
+}

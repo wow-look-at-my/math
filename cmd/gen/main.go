@@ -250,7 +250,7 @@ func main() {
 		Epsilon        string
 		Filename       string
 	}{
-		{"", "float32", "float32", true, false, false, true, "1e-6", "f32_bench_test.go"},
+		{"", "float32", "float32", true, true, false, true, "1e-6", "f32_bench_test.go"},
 		{"D", "float64", "float64", true, true, true, true, "1e-10", "d_bench_test.go"},
 	}
 

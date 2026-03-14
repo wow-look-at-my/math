@@ -437,6 +437,16 @@ func BenchmarkMat2Eq(b *testing.B) {
 	_ = r
 }
 
+func BenchmarkMat2ApproxEq(b *testing.B) {
+	a := NewMat2(1, 2, 3, 4)
+	c := NewMat2(1, 2, 3, 4)
+	var r bool
+	for b.Loop() {
+		r = a.ApproxEq(c, 1e-6)
+	}
+	_ = r
+}
+
 // Mat3 benchmarks
 
 func BenchmarkMat3Add(b *testing.B) {
@@ -519,6 +529,16 @@ func BenchmarkMat3Eq(b *testing.B) {
 	_ = r
 }
 
+func BenchmarkMat3ApproxEq(b *testing.B) {
+	a := NewMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	c := NewMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	var r bool
+	for b.Loop() {
+		r = a.ApproxEq(c, 1e-6)
+	}
+	_ = r
+}
+
 // Mat4 benchmarks
 
 func BenchmarkMat4Add(b *testing.B) {
@@ -597,6 +617,16 @@ func BenchmarkMat4Eq(b *testing.B) {
 	var r bool
 	for b.Loop() {
 		r = a.Eq(c)
+	}
+	_ = r
+}
+
+func BenchmarkMat4ApproxEq(b *testing.B) {
+	a := NewMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	c := NewMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	var r bool
+	for b.Loop() {
+		r = a.ApproxEq(c, 1e-6)
 	}
 	_ = r
 }
