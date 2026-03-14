@@ -25,6 +25,24 @@ var funcMap = template.FuncMap{
 	"param":     func(i int) string { return []string{"x", "y", "z", "w"}[i] },
 	"last":      func(i, n int) bool { return i == n-1 },
 	"join":      strings.Join,
+	"intList": func(count, start int) string {
+		parts := make([]string, count)
+		for i := range parts {
+			parts[i] = fmt.Sprintf("%d", start+i)
+		}
+		return strings.Join(parts, ", ")
+	},
+	"invMat": func(n int) string {
+		switch n {
+		case 2:
+			return "1, 2, 3, 4"
+		case 3:
+			return "1, 2, 3, 0, 1, 4, 5, 6, 0"
+		case 4:
+			return "1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1"
+		}
+		return ""
+	},
 }
 
 type vecData struct {
@@ -53,6 +71,19 @@ type itestData struct {
 	Prefix   string
 	ElemType string
 	Signed   bool
+}
+
+type benchData struct {
+	Name           string
+	Prefix         string
+	ElemType       string
+	LenType        string
+	LerpT          string
+	HasVecApproxEq bool
+	HasMatApproxEq bool
+	HasFloat32     bool
+	HasMat3        bool
+	Epsilon        string
 }
 
 // genDir returns the directory containing this source file,
@@ -210,6 +241,31 @@ func main() {
 			ElemType: it.GoType,
 			Signed:   it.Signed,
 		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	// Generate benchmark files.
+	benchTmpl := template.Must(
+		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
+	)
+
+	benchTypes := []benchData{
+		{Name: "F32", Prefix: "", ElemType: "float32", LenType: "float32", LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true, HasFloat32: false, HasMat3: true, Epsilon: "1e-6"},
+		{Name: "F64", Prefix: "D", ElemType: "float64", LenType: "float64", LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true, HasFloat32: true, HasMat3: true, Epsilon: "1e-10"},
+	}
+
+	for _, it := range intTypes {
+		benchTypes = append(benchTypes, benchData{
+			Name: it.Prefix, Prefix: it.Prefix, ElemType: it.GoType, LenType: "float32", LerpT: "0.5",
+			HasVecApproxEq: false, HasMatApproxEq: false, HasFloat32: true, HasMat3: false, Epsilon: "",
+		})
+	}
+
+	for _, bt := range benchTypes {
+		filename := strings.ToLower(bt.Name) + "_bench_test.go"
+		if err := generateFile(benchTmpl, filename, bt); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
