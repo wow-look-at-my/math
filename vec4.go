@@ -2,72 +2,142 @@
 
 package math
 
-// TVec4 is a 4-component vector.
-type TVec4[T Float] [4]T
+import "math"
 
-// Vec4 is a TVec4 of float32.
-type Vec4 = TVec4[float32]
-
-func NewVec4(x float32, y float32, z float32, w float32) Vec4 {
-	return Vec4{x, y, z, w}
+// TVec4 is a generic 4-component vector.
+type TVec4[T Numeric] struct {
+	X T
+	Y T
+	Z T
+	W T
 }
 
-func (v TVec4[T]) X() T { return v[0] }
-func (v TVec4[T]) Y() T { return v[1] }
-func (v TVec4[T]) Z() T { return v[2] }
-func (v TVec4[T]) W() T { return v[3] }
-
 func (a TVec4[T]) Add(b TVec4[T]) TVec4[T] {
-	return TVec4[T]{a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]}
+	return TVec4[T]{
+		X: a.X + b.X,
+		Y: a.Y + b.Y,
+		Z: a.Z + b.Z,
+		W: a.W + b.W,
+	}
 }
 
 func (a TVec4[T]) Sub(b TVec4[T]) TVec4[T] {
-	return TVec4[T]{a[0] - b[0], a[1] - b[1], a[2] - b[2], a[3] - b[3]}
+	return TVec4[T]{
+		X: a.X - b.X,
+		Y: a.Y - b.Y,
+		Z: a.Z - b.Z,
+		W: a.W - b.W,
+	}
 }
 
 func (v TVec4[T]) Scale(s T) TVec4[T] {
-	return TVec4[T]{v[0] * s, v[1] * s, v[2] * s, v[3] * s}
+	return TVec4[T]{
+		X: v.X * s,
+		Y: v.Y * s,
+		Z: v.Z * s,
+		W: v.W * s,
+	}
 }
 
 func (a TVec4[T]) Dot(b TVec4[T]) T {
-	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3]
-}
-
-func (v TVec4[T]) Len() T {
-	return sqrt(v.Dot(v))
+	return a.X*b.X + a.Y*b.Y + a.Z*b.Z + a.W*b.W
 }
 
 func (v TVec4[T]) LenSq() T {
 	return v.Dot(v)
 }
 
-func (v TVec4[T]) Normalize() TVec4[T] {
+func (a TVec4[T]) Eq(b TVec4[T]) bool {
+	return a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W
+}
+
+func (v TVec4[T]) XY() TVec2[T] {
+	return TVec2[T]{X: v.X, Y: v.Y}
+}
+
+func (v TVec4[T]) XYZ() TVec3[T] {
+	return TVec3[T]{X: v.X, Y: v.Y, Z: v.Z}
+}
+
+// Vec4 is a 4-component float32 vector.
+type Vec4 struct {
+	X float32
+	Y float32
+	Z float32
+	W float32
+}
+
+func NewVec4(x float32, y float32, z float32, w float32) Vec4 {
+	return Vec4{X: x, Y: y, Z: z, W: w}
+}
+
+func (a Vec4) Add(b Vec4) Vec4 {
+	return Vec4{
+		X: a.X + b.X,
+		Y: a.Y + b.Y,
+		Z: a.Z + b.Z,
+		W: a.W + b.W,
+	}
+}
+
+func (a Vec4) Sub(b Vec4) Vec4 {
+	return Vec4{
+		X: a.X - b.X,
+		Y: a.Y - b.Y,
+		Z: a.Z - b.Z,
+		W: a.W - b.W,
+	}
+}
+
+func (v Vec4) Scale(s float32) Vec4 {
+	return Vec4{
+		X: v.X * s,
+		Y: v.Y * s,
+		Z: v.Z * s,
+		W: v.W * s,
+	}
+}
+
+func (a Vec4) Dot(b Vec4) float32 {
+	return a.X*b.X + a.Y*b.Y + a.Z*b.Z + a.W*b.W
+}
+
+func (v Vec4) Len() float32 {
+	return float32(math.Sqrt(float64(v.Dot(v))))
+}
+
+func (v Vec4) LenSq() float32 {
+	return v.Dot(v)
+}
+
+func (v Vec4) Normalize() Vec4 {
 	l := v.Len()
 	if l == 0 {
-		return TVec4[T]{}
+		return Vec4{}
 	}
 	return v.Scale(1.0 / l)
 }
 
-func (a TVec4[T]) Lerp(b TVec4[T], t T) TVec4[T] {
+func (a Vec4) Lerp(b Vec4, t float32) Vec4 {
 	return a.Add(b.Sub(a).Scale(t))
 }
 
-func (a TVec4[T]) Dist(b TVec4[T]) T {
+func (a Vec4) Dist(b Vec4) float32 {
 	return a.Sub(b).Len()
 }
 
-func (a TVec4[T]) Eq(b TVec4[T]) bool {
-	return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]
+func (a Vec4) Eq(b Vec4) bool {
+	return a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W
 }
 
-func (a TVec4[T]) ApproxEq(b TVec4[T], eps T) bool {
-	return abs(a[0]-b[0]) <= eps && abs(a[1]-b[1]) <= eps && abs(a[2]-b[2]) <= eps && abs(a[3]-b[3]) <= eps
+func (a Vec4) ApproxEq(b Vec4, eps float32) bool {
+	return abs(a.X-b.X) <= eps && abs(a.Y-b.Y) <= eps && abs(a.Z-b.Z) <= eps && abs(a.W-b.W) <= eps
 }
 
-func (v TVec4[T]) XY() TVec2[T] {
-	return TVec2[T]{v[0], v[1]}
+func (v Vec4) XY() Vec2 {
+	return Vec2{X: v.X, Y: v.Y}
 }
-func (v TVec4[T]) XYZ() TVec3[T] {
-	return TVec3[T]{v[0], v[1], v[2]}
+
+func (v Vec4) XYZ() Vec3 {
+	return Vec3{X: v.X, Y: v.Y, Z: v.Z}
 }

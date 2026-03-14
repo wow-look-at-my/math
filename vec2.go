@@ -2,63 +2,110 @@
 
 package math
 
-// TVec2 is a 2-component vector.
-type TVec2[T Float] [2]T
+import "math"
 
-// Vec2 is a TVec2 of float32.
-type Vec2 = TVec2[float32]
-
-func NewVec2(x float32, y float32) Vec2 {
-	return Vec2{x, y}
+// TVec2 is a generic 2-component vector.
+type TVec2[T Numeric] struct {
+	X T
+	Y T
 }
 
-func (v TVec2[T]) X() T { return v[0] }
-func (v TVec2[T]) Y() T { return v[1] }
-
 func (a TVec2[T]) Add(b TVec2[T]) TVec2[T] {
-	return TVec2[T]{a[0] + b[0], a[1] + b[1]}
+	return TVec2[T]{
+		X: a.X + b.X,
+		Y: a.Y + b.Y,
+	}
 }
 
 func (a TVec2[T]) Sub(b TVec2[T]) TVec2[T] {
-	return TVec2[T]{a[0] - b[0], a[1] - b[1]}
+	return TVec2[T]{
+		X: a.X - b.X,
+		Y: a.Y - b.Y,
+	}
 }
 
 func (v TVec2[T]) Scale(s T) TVec2[T] {
-	return TVec2[T]{v[0] * s, v[1] * s}
+	return TVec2[T]{
+		X: v.X * s,
+		Y: v.Y * s,
+	}
 }
 
 func (a TVec2[T]) Dot(b TVec2[T]) T {
-	return a[0]*b[0] + a[1]*b[1]
-}
-
-func (v TVec2[T]) Len() T {
-	return sqrt(v.Dot(v))
+	return a.X*b.X + a.Y*b.Y
 }
 
 func (v TVec2[T]) LenSq() T {
 	return v.Dot(v)
 }
 
-func (v TVec2[T]) Normalize() TVec2[T] {
+func (a TVec2[T]) Eq(b TVec2[T]) bool {
+	return a.X == b.X && a.Y == b.Y
+}
+
+// Vec2 is a 2-component float32 vector.
+type Vec2 struct {
+	X float32
+	Y float32
+}
+
+func NewVec2(x float32, y float32) Vec2 {
+	return Vec2{X: x, Y: y}
+}
+
+func (a Vec2) Add(b Vec2) Vec2 {
+	return Vec2{
+		X: a.X + b.X,
+		Y: a.Y + b.Y,
+	}
+}
+
+func (a Vec2) Sub(b Vec2) Vec2 {
+	return Vec2{
+		X: a.X - b.X,
+		Y: a.Y - b.Y,
+	}
+}
+
+func (v Vec2) Scale(s float32) Vec2 {
+	return Vec2{
+		X: v.X * s,
+		Y: v.Y * s,
+	}
+}
+
+func (a Vec2) Dot(b Vec2) float32 {
+	return a.X*b.X + a.Y*b.Y
+}
+
+func (v Vec2) Len() float32 {
+	return float32(math.Sqrt(float64(v.Dot(v))))
+}
+
+func (v Vec2) LenSq() float32 {
+	return v.Dot(v)
+}
+
+func (v Vec2) Normalize() Vec2 {
 	l := v.Len()
 	if l == 0 {
-		return TVec2[T]{}
+		return Vec2{}
 	}
 	return v.Scale(1.0 / l)
 }
 
-func (a TVec2[T]) Lerp(b TVec2[T], t T) TVec2[T] {
+func (a Vec2) Lerp(b Vec2, t float32) Vec2 {
 	return a.Add(b.Sub(a).Scale(t))
 }
 
-func (a TVec2[T]) Dist(b TVec2[T]) T {
+func (a Vec2) Dist(b Vec2) float32 {
 	return a.Sub(b).Len()
 }
 
-func (a TVec2[T]) Eq(b TVec2[T]) bool {
-	return a[0] == b[0] && a[1] == b[1]
+func (a Vec2) Eq(b Vec2) bool {
+	return a.X == b.X && a.Y == b.Y
 }
 
-func (a TVec2[T]) ApproxEq(b TVec2[T], eps T) bool {
-	return abs(a[0]-b[0]) <= eps && abs(a[1]-b[1]) <= eps
+func (a Vec2) ApproxEq(b Vec2, eps float32) bool {
+	return abs(a.X-b.X) <= eps && abs(a.Y-b.Y) <= eps
 }

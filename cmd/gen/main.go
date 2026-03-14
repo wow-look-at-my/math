@@ -36,6 +36,25 @@ type matData struct {
 	N2 int
 }
 
+type ivecData struct {
+	N        int
+	Prefix   string
+	ElemType string
+}
+
+type imatData struct {
+	N        int
+	N2       int
+	Prefix   string
+	ElemType string
+}
+
+type itestData struct {
+	Prefix   string
+	ElemType string
+	Signed   bool
+}
+
 // genDir returns the directory containing this source file,
 // which is where the .tmpl files live.
 func genDir() string {
@@ -71,7 +90,17 @@ func main() {
 	matTmpl := template.Must(
 		template.New("mat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "mat.go.tmpl")),
 	)
+	ivecTmpl := template.Must(
+		template.New("ivec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ivec.go.tmpl")),
+	)
+	imatTmpl := template.Must(
+		template.New("imat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "imat.go.tmpl")),
+	)
+	itestTmpl := template.Must(
+		template.New("itest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "itest.go.tmpl")),
+	)
 
+	// Generate generic + float concrete types.
 	for _, n := range []int{2, 3, 4} {
 		if err := generateFile(vecTmpl, fmt.Sprintf("vec%d.go", n), vecData{N: n}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -81,6 +110,56 @@ func main() {
 
 	for _, n := range []int{2, 3, 4} {
 		if err := generateFile(matTmpl, fmt.Sprintf("mat%d.go", n), matData{N: n, N2: n * n}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	// Generate integer concrete types.
+	intTypes := []struct {
+		Prefix string
+		GoType string
+		Signed bool
+	}{
+		{"I8", "int8", true},
+		{"I16", "int16", true},
+		{"I32", "int32", true},
+		{"I64", "int64", true},
+		{"U8", "uint8", false},
+		{"U16", "uint16", false},
+		{"U32", "uint32", false},
+		{"U64", "uint64", false},
+	}
+
+	for _, it := range intTypes {
+		prefix := strings.ToLower(it.Prefix)
+		for _, n := range []int{2, 3, 4} {
+			if err := generateFile(ivecTmpl, fmt.Sprintf("%svec%d.go", prefix, n), ivecData{
+				N:        n,
+				Prefix:   it.Prefix,
+				ElemType: it.GoType,
+			}); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+
+			if err := generateFile(imatTmpl, fmt.Sprintf("%smat%d.go", prefix, n), imatData{
+				N:        n,
+				N2:       n * n,
+				Prefix:   it.Prefix,
+				ElemType: it.GoType,
+			}); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
+		// Generate test file for this integer type.
+		if err := generateFile(itestTmpl, fmt.Sprintf("%s_test.go", prefix), itestData{
+			Prefix:   it.Prefix,
+			ElemType: it.GoType,
+			Signed:   it.Signed,
+		}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}

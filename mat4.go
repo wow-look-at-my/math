@@ -2,73 +2,61 @@
 
 package math
 
-// TMat4 is a 4x4 matrix in column-major order.
-type TMat4[T Float] [16]T
+import "math"
 
-// Mat4 is a TMat4 of float32.
-type Mat4 = TMat4[float32]
+// TMat4 is a generic 4x4 matrix in column-major order.
+type TMat4[T Numeric] struct {
+	Data [16]T
+}
 
 // NewTMat4 creates a 4x4 matrix from row-major arguments.
-func NewTMat4[T Float](
+func NewTMat4[T Numeric](
 	m00, m01, m02, m03 T,
 	m10, m11, m12, m13 T,
 	m20, m21, m22, m23 T,
 	m30, m31, m32, m33 T,
 ) TMat4[T] {
-	return TMat4[T]{
+	return TMat4[T]{Data: [16]T{
 		m00, m10, m20, m30, // col 0
 		m01, m11, m21, m31, // col 1
 		m02, m12, m22, m32, // col 2
 		m03, m13, m23, m33, // col 3
-	}
-}
-
-func NewMat4(
-	m00, m01, m02, m03 float32,
-	m10, m11, m12, m13 float32,
-	m20, m21, m22, m23 float32,
-	m30, m31, m32, m33 float32,
-) Mat4 {
-	return NewTMat4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33)
-}
-
-func Mat4Identity() Mat4 {
-	return NewMat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+	}}
 }
 
 func (m TMat4[T]) Col(c int) TVec4[T] {
 	i := c * 4
-	return TVec4[T]{m[i+0], m[i+1], m[i+2], m[i+3]}
+	return TVec4[T]{X: m.Data[i+0], Y: m.Data[i+1], Z: m.Data[i+2], W: m.Data[i+3]}
 }
 
 func (m TMat4[T]) Row(r int) TVec4[T] {
-	return TVec4[T]{m[r+0], m[r+4], m[r+8], m[r+12]}
+	return TVec4[T]{X: m.Data[r+0], Y: m.Data[r+4], Z: m.Data[r+8], W: m.Data[r+12]}
 }
 
 func (m TMat4[T]) At(row, col int) T {
-	return m[col*4+row]
+	return m.Data[col*4+row]
 }
 
 func (a TMat4[T]) Add(b TMat4[T]) TMat4[T] {
 	var out TMat4[T]
-	for i := range out {
-		out[i] = a[i] + b[i]
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] + b.Data[i]
 	}
 	return out
 }
 
 func (a TMat4[T]) Sub(b TMat4[T]) TMat4[T] {
 	var out TMat4[T]
-	for i := range out {
-		out[i] = a[i] - b[i]
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] - b.Data[i]
 	}
 	return out
 }
 
 func (m TMat4[T]) Scale(s T) TMat4[T] {
 	var out TMat4[T]
-	for i := range out {
-		out[i] = m[i] * s
+	for i := range out.Data {
+		out.Data[i] = m.Data[i] * s
 	}
 	return out
 }
@@ -78,27 +66,29 @@ func (a TMat4[T]) Mul(b TMat4[T]) TMat4[T] {
 	for c := 0; c < 4; c++ {
 		bc := b.Col(c)
 		for r := 0; r < 4; r++ {
-			out[c*4+r] = a.Row(r).Dot(bc)
+			out.Data[c*4+r] = a.Row(r).Dot(bc)
 		}
 	}
 	return out
 }
+
 func (m TMat4[T]) MulVec4(v TVec4[T]) TVec4[T] {
 	return TVec4[T]{
-		m.Row(0).Dot(v),
-		m.Row(1).Dot(v),
-		m.Row(2).Dot(v),
-		m.Row(3).Dot(v),
+		X: m.Row(0).Dot(v),
+		Y: m.Row(1).Dot(v),
+		Z: m.Row(2).Dot(v),
+		W: m.Row(3).Dot(v),
 	}
 }
 
 func (m TMat4[T]) Transpose() TMat4[T] {
-	return NewTMat4(
-		m.At(0, 0), m.At(1, 0), m.At(2, 0), m.At(3, 0),
-		m.At(0, 1), m.At(1, 1), m.At(2, 1), m.At(3, 1),
-		m.At(0, 2), m.At(1, 2), m.At(2, 2), m.At(3, 2),
-		m.At(0, 3), m.At(1, 3), m.At(2, 3), m.At(3, 3),
-	)
+	var out TMat4[T]
+	for r := 0; r < 4; r++ {
+		for c := 0; c < 4; c++ {
+			out.Data[c*4+r] = m.Data[r*4+c]
+		}
+	}
+	return out
 }
 
 func (m TMat4[T]) cofactor(row, col int) T {
@@ -125,41 +115,165 @@ func (m TMat4[T]) Det() T {
 	a, b, c, d := m.At(0, 0), m.At(0, 1), m.At(0, 2), m.At(0, 3)
 	return a*m.cofactor(0, 0) - b*m.cofactor(0, 1) + c*m.cofactor(0, 2) - d*m.cofactor(0, 3)
 }
-
-func (m TMat4[T]) Inverse() TMat4[T] {
-	d := m.Det()
-	if d == 0 {
-		return TMat4[T]{}
+func (a TMat4[T]) Eq(b TMat4[T]) bool {
+	for i := range a.Data {
+		if a.Data[i] != b.Data[i] {
+			return false
+		}
 	}
-	invD := 1.0 / d
+	return true
+}
 
-	var out TMat4[T]
+// Mat4 is a 4x4 float32 matrix in column-major order.
+type Mat4 struct {
+	Data [16]float32
+}
+
+// NewMat4 creates a 4x4 matrix from row-major arguments.
+func NewMat4(
+	m00, m01, m02, m03 float32,
+	m10, m11, m12, m13 float32,
+	m20, m21, m22, m23 float32,
+	m30, m31, m32, m33 float32,
+) Mat4 {
+	return Mat4{Data: [16]float32{
+		m00, m10, m20, m30, // col 0
+		m01, m11, m21, m31, // col 1
+		m02, m12, m22, m32, // col 2
+		m03, m13, m23, m33, // col 3
+	}}
+}
+
+func Mat4Identity() Mat4 {
+	return NewMat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+}
+
+func (m Mat4) Col(c int) Vec4 {
+	i := c * 4
+	return Vec4{X: m.Data[i+0], Y: m.Data[i+1], Z: m.Data[i+2], W: m.Data[i+3]}
+}
+
+func (m Mat4) Row(r int) Vec4 {
+	return Vec4{X: m.Data[r+0], Y: m.Data[r+4], Z: m.Data[r+8], W: m.Data[r+12]}
+}
+
+func (m Mat4) At(row, col int) float32 {
+	return m.Data[col*4+row]
+}
+
+func (a Mat4) Add(b Mat4) Mat4 {
+	var out Mat4
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] + b.Data[i]
+	}
+	return out
+}
+
+func (a Mat4) Sub(b Mat4) Mat4 {
+	var out Mat4
+	for i := range out.Data {
+		out.Data[i] = a.Data[i] - b.Data[i]
+	}
+	return out
+}
+
+func (m Mat4) Scale(s float32) Mat4 {
+	var out Mat4
+	for i := range out.Data {
+		out.Data[i] = m.Data[i] * s
+	}
+	return out
+}
+
+func (a Mat4) Mul(b Mat4) Mat4 {
+	var out Mat4
 	for c := 0; c < 4; c++ {
+		bc := b.Col(c)
 		for r := 0; r < 4; r++ {
-			sign := T(1)
-			if (r+c)%2 != 0 {
-				sign = -1
-			}
-			out[c*4+r] = sign * m.cofactor(c, r) * invD
+			out.Data[c*4+r] = a.Row(r).Dot(bc)
 		}
 	}
 	return out
 }
 
-func (m TMat4[T]) Mat3() TMat3[T] {
-	return TMat3[T]{
-		m[0], m[1], m[2],
-		m[4], m[5], m[6],
-		m[8], m[9], m[10],
+func (m Mat4) MulVec4(v Vec4) Vec4 {
+	return Vec4{
+		X: m.Row(0).Dot(v),
+		Y: m.Row(1).Dot(v),
+		Z: m.Row(2).Dot(v),
+		W: m.Row(3).Dot(v),
 	}
+}
+
+func (m Mat4) Transpose() Mat4 {
+	var out Mat4
+	for r := 0; r < 4; r++ {
+		for c := 0; c < 4; c++ {
+			out.Data[c*4+r] = m.Data[r*4+c]
+		}
+	}
+	return out
+}
+
+func (m Mat4) cofactor(row, col int) float32 {
+	var sub [9]float32
+	idx := 0
+	for c := 0; c < 4; c++ {
+		if c == col {
+			continue
+		}
+		for r := 0; r < 4; r++ {
+			if r == row {
+				continue
+			}
+			sub[idx] = m.At(r, c)
+			idx++
+		}
+	}
+	return sub[0]*(sub[4]*sub[8]-sub[5]*sub[7]) -
+		sub[3]*(sub[1]*sub[8]-sub[2]*sub[7]) +
+		sub[6]*(sub[1]*sub[5]-sub[2]*sub[4])
+}
+
+func (m Mat4) Det() float32 {
+	a, b, c, d := m.At(0, 0), m.At(0, 1), m.At(0, 2), m.At(0, 3)
+	return a*m.cofactor(0, 0) - b*m.cofactor(0, 1) + c*m.cofactor(0, 2) - d*m.cofactor(0, 3)
+}
+
+func (m Mat4) Inverse() Mat4 {
+	d := m.Det()
+	if d == 0 {
+		return Mat4{}
+	}
+	invD := 1.0 / d
+
+	var out Mat4
+	for c := 0; c < 4; c++ {
+		for r := 0; r < 4; r++ {
+			sign := float32(1)
+			if (r+c)%2 != 0 {
+				sign = -1
+			}
+			out.Data[c*4+r] = sign * m.cofactor(c, r) * invD
+		}
+	}
+	return out
+}
+
+func (m Mat4) Mat3() Mat3 {
+	return Mat3{Data: [9]float32{
+		m.Data[0], m.Data[1], m.Data[2],
+		m.Data[4], m.Data[5], m.Data[6],
+		m.Data[8], m.Data[9], m.Data[10],
+	}}
 }
 
 // Translation creates a translation matrix.
 func Translation(v Vec3) Mat4 {
 	return NewMat4(
-		1, 0, 0, v[0],
-		0, 1, 0, v[1],
-		0, 0, 1, v[2],
+		1, 0, 0, v.X,
+		0, 1, 0, v.Y,
+		0, 0, 1, v.Z,
 		0, 0, 0, 1,
 	)
 }
@@ -167,17 +281,17 @@ func Translation(v Vec3) Mat4 {
 // Scaling creates a scale matrix.
 func Scaling(v Vec3) Mat4 {
 	return NewMat4(
-		v[0], 0, 0, 0,
-		0, v[1], 0, 0,
-		0, 0, v[2], 0,
+		v.X, 0, 0, 0,
+		0, v.Y, 0, 0,
+		0, 0, v.Z, 0,
 		0, 0, 0, 1,
 	)
 }
 
 // RotationX creates a rotation matrix around the X axis. Angle in radians.
 func RotationX(angle float32) Mat4 {
-	c := cos(angle)
-	s := sin(angle)
+	c := float32(math.Cos(float64(angle)))
+	s := float32(math.Sin(float64(angle)))
 	return NewMat4(
 		1, 0, 0, 0,
 		0, c, -s, 0,
@@ -188,8 +302,8 @@ func RotationX(angle float32) Mat4 {
 
 // RotationY creates a rotation matrix around the Y axis. Angle in radians.
 func RotationY(angle float32) Mat4 {
-	c := cos(angle)
-	s := sin(angle)
+	c := float32(math.Cos(float64(angle)))
+	s := float32(math.Sin(float64(angle)))
 	return NewMat4(
 		c, 0, s, 0,
 		0, 1, 0, 0,
@@ -200,8 +314,8 @@ func RotationY(angle float32) Mat4 {
 
 // RotationZ creates a rotation matrix around the Z axis. Angle in radians.
 func RotationZ(angle float32) Mat4 {
-	c := cos(angle)
-	s := sin(angle)
+	c := float32(math.Cos(float64(angle)))
+	s := float32(math.Sin(float64(angle)))
 	return NewMat4(
 		c, -s, 0, 0,
 		s, c, 0, 0,
@@ -217,9 +331,9 @@ func LookAt(eye, center, up Vec3) Mat4 {
 	u := s.Cross(f)
 
 	return NewMat4(
-		s[0], s[1], s[2], -s.Dot(eye),
-		u[0], u[1], u[2], -u.Dot(eye),
-		-f[0], -f[1], -f[2], f.Dot(eye),
+		s.X, s.Y, s.Z, -s.Dot(eye),
+		u.X, u.Y, u.Z, -u.Dot(eye),
+		-f.X, -f.Y, -f.Z, f.Dot(eye),
 		0, 0, 0, 1,
 	)
 }
@@ -227,7 +341,7 @@ func LookAt(eye, center, up Vec3) Mat4 {
 // Perspective creates a perspective projection matrix.
 // fovY is vertical field of view in radians.
 func Perspective(fovY, aspect, near, far float32) Mat4 {
-	t := tan(fovY / 2.0)
+	t := float32(math.Tan(float64(fovY / 2.0)))
 	return NewMat4(
 		1.0/(aspect*t), 0, 0, 0,
 		0, 1.0/t, 0, 0,
@@ -244,4 +358,12 @@ func Ortho(left, right, bottom, top, near, far float32) Mat4 {
 		0, 0, -2.0/(far-near), -(far+near)/(far-near),
 		0, 0, 0, 1,
 	)
+}
+func (a Mat4) Eq(b Mat4) bool {
+	for i := range a.Data {
+		if a.Data[i] != b.Data[i] {
+			return false
+		}
+	}
+	return true
 }
