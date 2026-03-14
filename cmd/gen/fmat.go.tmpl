@@ -190,10 +190,9 @@ func (m {{.Prefix}}Mat4) Mat3() {{.Prefix}}Mat3 {
 	}}
 }
 
-{{if eq .Prefix "" -}}
-// Translation creates a translation matrix.
-func Translation(v Vec3) Mat4 {
-	return NewMat4(
+// {{.Prefix}}Translation creates a translation matrix.
+func {{.Prefix}}Translation(v {{.Prefix}}Vec3) {{.Prefix}}Mat4 {
+	return New{{.Prefix}}Mat4(
 		1, 0, 0, v.X,
 		0, 1, 0, v.Y,
 		0, 0, 1, v.Z,
@@ -201,9 +200,9 @@ func Translation(v Vec3) Mat4 {
 	)
 }
 
-// Scaling creates a scale matrix.
-func Scaling(v Vec3) Mat4 {
-	return NewMat4(
+// {{.Prefix}}Scaling creates a scale matrix.
+func {{.Prefix}}Scaling(v {{.Prefix}}Vec3) {{.Prefix}}Mat4 {
+	return New{{.Prefix}}Mat4(
 		v.X, 0, 0, 0,
 		0, v.Y, 0, 0,
 		0, 0, v.Z, 0,
@@ -211,11 +210,11 @@ func Scaling(v Vec3) Mat4 {
 	)
 }
 
-// RotationX creates a rotation matrix around the X axis. Angle in radians.
-func RotationX(angle float32) Mat4 {
-	c := float32(math.Cos(float64(angle)))
-	s := float32(math.Sin(float64(angle)))
-	return NewMat4(
+// {{.Prefix}}RotationX creates a rotation matrix around the X axis. Angle in radians.
+func {{.Prefix}}RotationX(angle {{.ElemType}}) {{.Prefix}}Mat4 {
+	c := {{.ElemType}}(math.Cos(float64(angle)))
+	s := {{.ElemType}}(math.Sin(float64(angle)))
+	return New{{.Prefix}}Mat4(
 		1, 0, 0, 0,
 		0, c, -s, 0,
 		0, s, c, 0,
@@ -223,11 +222,11 @@ func RotationX(angle float32) Mat4 {
 	)
 }
 
-// RotationY creates a rotation matrix around the Y axis. Angle in radians.
-func RotationY(angle float32) Mat4 {
-	c := float32(math.Cos(float64(angle)))
-	s := float32(math.Sin(float64(angle)))
-	return NewMat4(
+// {{.Prefix}}RotationY creates a rotation matrix around the Y axis. Angle in radians.
+func {{.Prefix}}RotationY(angle {{.ElemType}}) {{.Prefix}}Mat4 {
+	c := {{.ElemType}}(math.Cos(float64(angle)))
+	s := {{.ElemType}}(math.Sin(float64(angle)))
+	return New{{.Prefix}}Mat4(
 		c, 0, s, 0,
 		0, 1, 0, 0,
 		-s, 0, c, 0,
@@ -235,11 +234,11 @@ func RotationY(angle float32) Mat4 {
 	)
 }
 
-// RotationZ creates a rotation matrix around the Z axis. Angle in radians.
-func RotationZ(angle float32) Mat4 {
-	c := float32(math.Cos(float64(angle)))
-	s := float32(math.Sin(float64(angle)))
-	return NewMat4(
+// {{.Prefix}}RotationZ creates a rotation matrix around the Z axis. Angle in radians.
+func {{.Prefix}}RotationZ(angle {{.ElemType}}) {{.Prefix}}Mat4 {
+	c := {{.ElemType}}(math.Cos(float64(angle)))
+	s := {{.ElemType}}(math.Sin(float64(angle)))
+	return New{{.Prefix}}Mat4(
 		c, -s, 0, 0,
 		s, c, 0, 0,
 		0, 0, 1, 0,
@@ -247,13 +246,13 @@ func RotationZ(angle float32) Mat4 {
 	)
 }
 
-// LookAt creates a view matrix looking from eye toward center with the given up vector.
-func LookAt(eye, center, up Vec3) Mat4 {
+// {{.Prefix}}LookAt creates a view matrix looking from eye toward center with the given up vector.
+func {{.Prefix}}LookAt(eye, center, up {{.Prefix}}Vec3) {{.Prefix}}Mat4 {
 	f := center.Sub(eye).Normalize()
 	s := f.Cross(up).Normalize()
 	u := s.Cross(f)
 
-	return NewMat4(
+	return New{{.Prefix}}Mat4(
 		s.X, s.Y, s.Z, -s.Dot(eye),
 		u.X, u.Y, u.Z, -u.Dot(eye),
 		-f.X, -f.Y, -f.Z, f.Dot(eye),
@@ -261,11 +260,11 @@ func LookAt(eye, center, up Vec3) Mat4 {
 	)
 }
 
-// Perspective creates a perspective projection matrix.
+// {{.Prefix}}Perspective creates a perspective projection matrix.
 // fovY is vertical field of view in radians.
-func Perspective(fovY, aspect, near, far float32) Mat4 {
-	t := float32(math.Tan(float64(fovY / 2.0)))
-	return NewMat4(
+func {{.Prefix}}Perspective(fovY, aspect, near, far {{.ElemType}}) {{.Prefix}}Mat4 {
+	t := {{.ElemType}}(math.Tan(float64(fovY / 2.0)))
+	return New{{.Prefix}}Mat4(
 		1.0/(aspect*t), 0, 0, 0,
 		0, 1.0/t, 0, 0,
 		0, 0, -(far+near)/(far-near), -(2.0*far*near)/(far-near),
@@ -273,16 +272,15 @@ func Perspective(fovY, aspect, near, far float32) Mat4 {
 	)
 }
 
-// Ortho creates an orthographic projection matrix.
-func Ortho(left, right, bottom, top, near, far float32) Mat4 {
-	return NewMat4(
+// {{.Prefix}}Ortho creates an orthographic projection matrix.
+func {{.Prefix}}Ortho(left, right, bottom, top, near, far {{.ElemType}}) {{.Prefix}}Mat4 {
+	return New{{.Prefix}}Mat4(
 		2.0/(right-left), 0, 0, -(right+left)/(right-left),
 		0, 2.0/(top-bottom), 0, -(top+bottom)/(top-bottom),
 		0, 0, -2.0/(far-near), -(far+near)/(far-near),
 		0, 0, 0, 1,
 	)
 }
-{{end -}}
 {{end -}}
 
 func (a {{.Prefix}}Mat{{.N}}) Eq(b {{.Prefix}}Mat{{.N}}) bool {

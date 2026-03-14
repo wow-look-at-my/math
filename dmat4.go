@@ -148,6 +148,97 @@ func (m DMat4) Mat3() DMat3 {
 	}}
 }
 
+// DTranslation creates a translation matrix.
+func DTranslation(v DVec3) DMat4 {
+	return NewDMat4(
+		1, 0, 0, v.X,
+		0, 1, 0, v.Y,
+		0, 0, 1, v.Z,
+		0, 0, 0, 1,
+	)
+}
+
+// DScaling creates a scale matrix.
+func DScaling(v DVec3) DMat4 {
+	return NewDMat4(
+		v.X, 0, 0, 0,
+		0, v.Y, 0, 0,
+		0, 0, v.Z, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// DRotationX creates a rotation matrix around the X axis. Angle in radians.
+func DRotationX(angle float64) DMat4 {
+	c := float64(math.Cos(float64(angle)))
+	s := float64(math.Sin(float64(angle)))
+	return NewDMat4(
+		1, 0, 0, 0,
+		0, c, -s, 0,
+		0, s, c, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// DRotationY creates a rotation matrix around the Y axis. Angle in radians.
+func DRotationY(angle float64) DMat4 {
+	c := float64(math.Cos(float64(angle)))
+	s := float64(math.Sin(float64(angle)))
+	return NewDMat4(
+		c, 0, s, 0,
+		0, 1, 0, 0,
+		-s, 0, c, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// DRotationZ creates a rotation matrix around the Z axis. Angle in radians.
+func DRotationZ(angle float64) DMat4 {
+	c := float64(math.Cos(float64(angle)))
+	s := float64(math.Sin(float64(angle)))
+	return NewDMat4(
+		c, -s, 0, 0,
+		s, c, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// DLookAt creates a view matrix looking from eye toward center with the given up vector.
+func DLookAt(eye, center, up DVec3) DMat4 {
+	f := center.Sub(eye).Normalize()
+	s := f.Cross(up).Normalize()
+	u := s.Cross(f)
+
+	return NewDMat4(
+		s.X, s.Y, s.Z, -s.Dot(eye),
+		u.X, u.Y, u.Z, -u.Dot(eye),
+		-f.X, -f.Y, -f.Z, f.Dot(eye),
+		0, 0, 0, 1,
+	)
+}
+
+// DPerspective creates a perspective projection matrix.
+// fovY is vertical field of view in radians.
+func DPerspective(fovY, aspect, near, far float64) DMat4 {
+	t := float64(math.Tan(float64(fovY / 2.0)))
+	return NewDMat4(
+		1.0/(aspect*t), 0, 0, 0,
+		0, 1.0/t, 0, 0,
+		0, 0, -(far+near)/(far-near), -(2.0*far*near)/(far-near),
+		0, 0, -1, 0,
+	)
+}
+
+// DOrtho creates an orthographic projection matrix.
+func DOrtho(left, right, bottom, top, near, far float64) DMat4 {
+	return NewDMat4(
+		2.0/(right-left), 0, 0, -(right+left)/(right-left),
+		0, 2.0/(top-bottom), 0, -(top+bottom)/(top-bottom),
+		0, 0, -2.0/(far-near), -(far+near)/(far-near),
+		0, 0, 0, 1,
+	)
+}
 func (a DMat4) Eq(b DMat4) bool {
 	for i := range a.Data {
 		if a.Data[i] != b.Data[i] {
