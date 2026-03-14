@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // DVec2 is a 2-component float64 vector.
 type DVec2 struct {
@@ -76,4 +79,18 @@ func (v DVec2) Float32() Vec2 {
 		X: float32(v.X),
 		Y: float32(v.Y),
 	}
+}
+
+func (v DVec2) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]float64{v.X, v.Y})
+}
+
+func (v *DVec2) UnmarshalJSON(data []byte) error {
+	var arr [2]float64
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	return nil
 }

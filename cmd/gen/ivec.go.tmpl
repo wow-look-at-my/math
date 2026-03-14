@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // {{.Prefix}}Vec{{.N}} is a {{.N}}-component {{.ElemType}} vector.
 type {{.Prefix}}Vec{{.N}} struct {
@@ -109,3 +112,17 @@ func (v {{.Prefix}}Vec4) XYZ() {{.Prefix}}Vec3 {
 }
 
 {{end -}}
+func (v {{.Prefix}}Vec{{.N}}) MarshalJSON() ([]byte, error) {
+	return json.Marshal([{{.N}}]{{.ElemType}}{ {{- range $i := seq .N}}{{if $i}}, {{end}}v.{{component $i}}{{end -}} })
+}
+
+func (v *{{.Prefix}}Vec{{.N}}) UnmarshalJSON(data []byte) error {
+	var arr [{{.N}}]{{.ElemType}}
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+{{- range $i := seq .N}}
+	v.{{component $i}} = arr[{{$i}}]
+{{- end}}
+	return nil
+}

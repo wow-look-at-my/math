@@ -2,7 +2,10 @@
 
 package math
 
-import "math"
+import (
+	"encoding/json"
+	"math"
+)
 
 // Vec3 is a 3-component float32 vector.
 type Vec3 struct {
@@ -85,4 +88,19 @@ func (a Vec3) ApproxEq(b Vec3, eps float32) bool {
 
 func (v Vec3) XY() Vec2 {
 	return Vec2{X: v.X, Y: v.Y}
+}
+
+func (v Vec3) MarshalJSON() ([]byte, error) {
+	return json.Marshal([3]float32{v.X, v.Y, v.Z})
+}
+
+func (v *Vec3) UnmarshalJSON(data []byte) error {
+	var arr [3]float32
+	if err := json.Unmarshal(data, &arr); err != nil {
+		return err
+	}
+	v.X = arr[0]
+	v.Y = arr[1]
+	v.Z = arr[2]
+	return nil
 }
