@@ -2,8 +2,6 @@
 
 package math
 
-import "math"
-
 // TVec4 is a generic 4-component vector.
 type TVec4[T Numeric] struct {
 	X T
@@ -57,87 +55,4 @@ func (v TVec4[T]) XY() TVec2[T] {
 
 func (v TVec4[T]) XYZ() TVec3[T] {
 	return TVec3[T]{X: v.X, Y: v.Y, Z: v.Z}
-}
-
-// Vec4 is a 4-component float32 vector.
-type Vec4 struct {
-	X float32
-	Y float32
-	Z float32
-	W float32
-}
-
-func NewVec4(x float32, y float32, z float32, w float32) Vec4 {
-	return Vec4{X: x, Y: y, Z: z, W: w}
-}
-
-func (a Vec4) Add(b Vec4) Vec4 {
-	return Vec4{
-		X: a.X + b.X,
-		Y: a.Y + b.Y,
-		Z: a.Z + b.Z,
-		W: a.W + b.W,
-	}
-}
-
-func (a Vec4) Sub(b Vec4) Vec4 {
-	return Vec4{
-		X: a.X - b.X,
-		Y: a.Y - b.Y,
-		Z: a.Z - b.Z,
-		W: a.W - b.W,
-	}
-}
-
-func (v Vec4) Scale(s float32) Vec4 {
-	return Vec4{
-		X: v.X * s,
-		Y: v.Y * s,
-		Z: v.Z * s,
-		W: v.W * s,
-	}
-}
-
-func (a Vec4) Dot(b Vec4) float32 {
-	return a.X*b.X + a.Y*b.Y + a.Z*b.Z + a.W*b.W
-}
-
-func (v Vec4) Len() float32 {
-	return float32(math.Sqrt(float64(v.Dot(v))))
-}
-
-func (v Vec4) LenSq() float32 {
-	return v.Dot(v)
-}
-
-func (v Vec4) Normalize() Vec4 {
-	l := v.Len()
-	if l == 0 {
-		return Vec4{}
-	}
-	return v.Scale(1.0 / l)
-}
-
-func (a Vec4) Lerp(b Vec4, t float32) Vec4 {
-	return a.Add(b.Sub(a).Scale(t))
-}
-
-func (a Vec4) Dist(b Vec4) float32 {
-	return a.Sub(b).Len()
-}
-
-func (a Vec4) Eq(b Vec4) bool {
-	return a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W
-}
-
-func (a Vec4) ApproxEq(b Vec4, eps float32) bool {
-	return abs(a.X-b.X) <= eps && abs(a.Y-b.Y) <= eps && abs(a.Z-b.Z) <= eps && abs(a.W-b.W) <= eps
-}
-
-func (v Vec4) XY() Vec2 {
-	return Vec2{X: v.X, Y: v.Y}
-}
-
-func (v Vec4) XYZ() Vec3 {
-	return Vec3{X: v.X, Y: v.Y, Z: v.Z}
 }

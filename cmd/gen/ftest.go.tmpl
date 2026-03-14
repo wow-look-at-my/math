@@ -3,6 +3,7 @@
 package math
 
 import (
+	stdmath "math"
 	"testing"
 
 	"github.com/wow-look-at-my/testify/assert"
@@ -66,6 +67,13 @@ func Test{{.Prefix}}Vec2Lerp(t *testing.T) {
 func Test{{.Prefix}}Vec2Eq(t *testing.T) {
 	assert.True(t, {{.Prefix}}Vec2{X: 1, Y: 2}.Eq({{.Prefix}}Vec2{X: 1, Y: 2}))
 	assert.False(t, {{.Prefix}}Vec2{X: 1, Y: 2}.Eq({{.Prefix}}Vec2{X: 1, Y: 3}))
+}
+
+func Test{{.Prefix}}Vec2ApproxEq(t *testing.T) {
+	a := New{{.Prefix}}Vec2(1.0, 2.0)
+	b := New{{.Prefix}}Vec2(1.0001, 2.0001)
+	assert.True(t, a.ApproxEq(b, 0.001))
+	assert.False(t, a.ApproxEq(b, 0.00001))
 }
 
 {{if ne .Prefix "" -}}
@@ -558,3 +566,73 @@ func Test{{.Prefix}}Mat4Float32(t *testing.T) {
 	assert.Equal(t, Mat4Identity(), {{.Prefix}}Mat4Identity().Float32())
 }
 {{end -}}
+
+// ---------------------------------------------------------------------------
+// {{.Prefix}} Graphics helpers
+// ---------------------------------------------------------------------------
+
+func Test{{.Prefix}}Translation(t *testing.T) {
+	m := {{.Prefix}}Translation(New{{.Prefix}}Vec3(2, 3, 4))
+	v := New{{.Prefix}}Vec4(1, 1, 1, 1)
+	got := m.MulVec4(v)
+	want := New{{.Prefix}}Vec4(3, 4, 5, 1)
+	assert.True(t, got.Eq(want))
+}
+
+func Test{{.Prefix}}Scaling(t *testing.T) {
+	m := {{.Prefix}}Scaling(New{{.Prefix}}Vec3(2, 3, 4))
+	v := New{{.Prefix}}Vec4(1, 1, 1, 1)
+	got := m.MulVec4(v)
+	want := New{{.Prefix}}Vec4(2, 3, 4, 1)
+	assert.True(t, got.Eq(want))
+}
+
+func Test{{.Prefix}}RotationX(t *testing.T) {
+	m := {{.Prefix}}RotationX({{.ElemType}}(stdmath.Pi / 2))
+	v := New{{.Prefix}}Vec4(0, 1, 0, 1)
+	got := m.MulVec4(v)
+	want := New{{.Prefix}}Vec4(0, 0, 1, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}RotationY(t *testing.T) {
+	m := {{.Prefix}}RotationY({{.ElemType}}(stdmath.Pi / 2))
+	v := New{{.Prefix}}Vec4(1, 0, 0, 1)
+	got := m.MulVec4(v)
+	want := New{{.Prefix}}Vec4(0, 0, -1, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}RotationZ(t *testing.T) {
+	m := {{.Prefix}}RotationZ({{.ElemType}}(stdmath.Pi / 2))
+	v := New{{.Prefix}}Vec4(1, 0, 0, 1)
+	got := m.MulVec4(v)
+	want := New{{.Prefix}}Vec4(0, 1, 0, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}LookAt(t *testing.T) {
+	eye := New{{.Prefix}}Vec3(0, 0, 5)
+	center := New{{.Prefix}}Vec3(0, 0, 0)
+	up := New{{.Prefix}}Vec3(0, 1, 0)
+	m := {{.Prefix}}LookAt(eye, center, up)
+	v := m.MulVec4(New{{.Prefix}}Vec4(0, 0, 0, 1))
+	assert.True(t, v.ApproxEq(New{{.Prefix}}Vec4(0, 0, -5, 1), 1e-5))
+}
+
+func Test{{.Prefix}}Perspective(t *testing.T) {
+	m := {{.Prefix}}Perspective({{.ElemType}}(stdmath.Pi/4), 1.0, 0.1, 100.0)
+	v := m.MulVec4(New{{.Prefix}}Vec4(0, 0, -0.1, 1))
+	ndc := v.Scale(1.0 / v.W)
+	assert.False(t, ndc.Z < -1.01 || ndc.Z > -0.99)
+}
+
+func Test{{.Prefix}}Ortho(t *testing.T) {
+	m := {{.Prefix}}Ortho(-1, 1, -1, 1, -1, 1)
+	v := m.MulVec4(New{{.Prefix}}Vec4(0, 0, 0, 1))
+	want := New{{.Prefix}}Vec4(0, 0, 0, 1)
+	assert.True(t, v.ApproxEq(want, 1e-5))
+}
+
+// ensure stdmath import is used
+var _ = stdmath.Pi
