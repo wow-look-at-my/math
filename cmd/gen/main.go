@@ -74,6 +74,7 @@ type itestData struct {
 }
 
 type benchData struct {
+	Name           string
 	Prefix         string
 	ElemType       string
 	LenType        string
@@ -239,47 +240,21 @@ func main() {
 		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
 	)
 
-	benchTypes := []struct {
-		Prefix         string
-		ElemType       string
-		LenType        string
-		HasVecApproxEq bool
-		HasMatApproxEq bool
-		HasFloat32     bool
-		HasMat3        bool
-		Epsilon        string
-		Filename       string
-	}{
-		{"", "float32", "float32", true, true, false, true, "1e-6", "f32_bench_test.go"},
-		{"D", "float64", "float64", true, true, true, true, "1e-10", "d_bench_test.go"},
+	benchTypes := []benchData{
+		{Name: "F32", Prefix: "", ElemType: "float32", LenType: "float32", LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true, HasFloat32: false, HasMat3: true, Epsilon: "1e-6"},
+		{Name: "F64", Prefix: "D", ElemType: "float64", LenType: "float64", LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true, HasFloat32: true, HasMat3: true, Epsilon: "1e-10"},
 	}
 
 	for _, it := range intTypes {
-		benchTypes = append(benchTypes, struct {
-			Prefix         string
-			ElemType       string
-			LenType        string
-			HasVecApproxEq bool
-			HasMatApproxEq bool
-			HasFloat32     bool
-			HasMat3        bool
-			Epsilon        string
-			Filename       string
-		}{it.Prefix, it.GoType, "float32", false, false, true, false, "", strings.ToLower(it.Prefix) + "_bench_test.go"})
+		benchTypes = append(benchTypes, benchData{
+			Name: it.Prefix, Prefix: it.Prefix, ElemType: it.GoType, LenType: "float32", LerpT: "0.5",
+			HasVecApproxEq: false, HasMatApproxEq: false, HasFloat32: true, HasMat3: false, Epsilon: "",
+		})
 	}
 
 	for _, bt := range benchTypes {
-		if err := generateFile(benchTmpl, bt.Filename, benchData{
-			Prefix:         bt.Prefix,
-			ElemType:       bt.ElemType,
-			LenType:        bt.LenType,
-			LerpT:          "0.5",
-			HasVecApproxEq: bt.HasVecApproxEq,
-			HasMatApproxEq: bt.HasMatApproxEq,
-			HasFloat32:     bt.HasFloat32,
-			HasMat3:        bt.HasMat3,
-			Epsilon:        bt.Epsilon,
-		}); err != nil {
+		filename := strings.ToLower(bt.Name) + "_bench_test.go"
+		if err := generateFile(benchTmpl, filename, bt); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}

@@ -3,272 +3,207 @@
 package math
 
 import "testing"
-{{range $i := seq 3}}{{$n := add $i 2}}
-// {{$.Prefix}}Vec{{$n}} benchmarks
 
-func Benchmark{{$.Prefix}}Vec{{$n}}Add(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
+func Benchmark{{.Name}}Inverse(b *testing.B) {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	b.Run("Mat{{$n}}", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
+		inv := m.Inverse()
+		for b.Loop() { inv = m.Inverse() }
+		_ = inv
+	})
+{{- end}}
 }
 
-func Benchmark{{$.Prefix}}Vec{{$n}}Sub(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
+func Benchmark{{.Name}}Mul(b *testing.B) {
+{{- range $i := seq 3}}{{$n := add $i 2}}{{$n2 := mul $n $n}}
+	b.Run("Mat{{$n}}", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
+		for b.Loop() { a = a.Mul(c) }
+		_ = a
+	})
+	b.Run("Mat{{$n}}Vec{{$n}}", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		v := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		for b.Loop() { v = m.MulVec{{$n}}(v) }
+		_ = v
+	})
+{{- end}}
 }
 
-func Benchmark{{$.Prefix}}Vec{{$n}}Scale(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
+func Benchmark{{.Name}}Det(b *testing.B) {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	b.Run("Mat{{$n}}", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
+		var r {{$.ElemType}}
+		for b.Loop() { r = m.Det() }
+		_ = r
+	})
+{{- end}}
 }
 
-func Benchmark{{$.Prefix}}Vec{{$n}}Dot(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-	var r {{$.ElemType}}
-	for b.Loop() {
-		r = a.Dot(c)
-	}
-	_ = r
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}LenSq(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	var r {{$.ElemType}}
-	for b.Loop() {
-		r = a.LenSq()
-	}
-	_ = r
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Len(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	var r {{$.LenType}}
-	for b.Loop() {
-		r = a.Len()
-	}
-	_ = r
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Normalize(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	v := a.Normalize()
-	for b.Loop() {
-		v = a.Normalize()
-	}
-	_ = v
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Lerp(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-	v := a.Lerp(c, {{$.LerpT}})
-	for b.Loop() {
-		v = a.Lerp(c, {{$.LerpT}})
-	}
-	_ = v
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Dist(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-	var r {{$.LenType}}
-	for b.Loop() {
-		r = a.Dist(c)
-	}
-	_ = r
-}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Eq(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
+func Benchmark{{.Name}}Ops(b *testing.B) {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	b.Run("Vec{{$n}}/Add", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+		for b.Loop() { a = a.Add(c) }
+		_ = a
+	})
+	b.Run("Vec{{$n}}/Sub", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+		for b.Loop() { a = a.Sub(c) }
+		_ = a
+	})
+	b.Run("Vec{{$n}}/Scale", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		for b.Loop() { a = a.Scale(2) }
+		_ = a
+	})
+	b.Run("Vec{{$n}}/Dot", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+		var r {{$.ElemType}}
+		for b.Loop() { r = a.Dot(c) }
+		_ = r
+	})
+	b.Run("Vec{{$n}}/LenSq", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		var r {{$.ElemType}}
+		for b.Loop() { r = a.LenSq() }
+		_ = r
+	})
+	b.Run("Vec{{$n}}/Len", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		var r {{$.LenType}}
+		for b.Loop() { r = a.Len() }
+		_ = r
+	})
+	b.Run("Vec{{$n}}/Normalize", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		v := a.Normalize()
+		for b.Loop() { v = a.Normalize() }
+		_ = v
+	})
+	b.Run("Vec{{$n}}/Lerp", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+		v := a.Lerp(c, {{$.LerpT}})
+		for b.Loop() { v = a.Lerp(c, {{$.LerpT}}) }
+		_ = v
+	})
+	b.Run("Vec{{$n}}/Dist", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+		var r {{$.LenType}}
+		for b.Loop() { r = a.Dist(c) }
+		_ = r
+	})
+	b.Run("Vec{{$n}}/Eq", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		var r bool
+		for b.Loop() { r = a.Eq(c) }
+		_ = r
+	})
 {{- if $.HasVecApproxEq}}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}ApproxEq(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	var r bool
-	for b.Loop() {
-		r = a.ApproxEq(c, {{$.Epsilon}})
-	}
-	_ = r
-}
+	b.Run("Vec{{$n}}/ApproxEq", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		var r bool
+		for b.Loop() { r = a.ApproxEq(c, {{$.Epsilon}}) }
+		_ = r
+	})
 {{- end}}
 {{- if $.HasFloat32}}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}Float32(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	var r Vec{{$n}}
-	for b.Loop() {
-		r = a.Float32()
-	}
-	_ = r
-}
+	b.Run("Vec{{$n}}/Float32", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		var r Vec{{$n}}
+		for b.Loop() { r = a.Float32() }
+		_ = r
+	})
 {{- end}}
 {{- if eq $n 3}}
-
-func Benchmark{{$.Prefix}}Vec3Cross(b *testing.B) {
-	a := New{{$.Prefix}}Vec3({{intList 3 1}})
-	c := New{{$.Prefix}}Vec3({{intList 3 4}})
-	for b.Loop() {
-		a = a.Cross(c)
-	}
-	_ = a
-}
+	b.Run("Vec3/Cross", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec3({{intList 3 1}})
+		c := New{{$.Prefix}}Vec3({{intList 3 4}})
+		for b.Loop() { a = a.Cross(c) }
+		_ = a
+	})
 {{- end}}
 {{- if ge $n 3}}
-
-func Benchmark{{$.Prefix}}Vec{{$n}}XY(b *testing.B) {
-	a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	v := a.XY()
-	for b.Loop() {
-		v = a.XY()
-	}
-	_ = v
-}
+	b.Run("Vec{{$n}}/XY", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+		v := a.XY()
+		for b.Loop() { v = a.XY() }
+		_ = v
+	})
 {{- end}}
 {{- if eq $n 4}}
-
-func Benchmark{{$.Prefix}}Vec4XYZ(b *testing.B) {
-	a := New{{$.Prefix}}Vec4({{intList 4 1}})
-	v := a.XYZ()
-	for b.Loop() {
-		v = a.XYZ()
-	}
-	_ = v
-}
+	b.Run("Vec4/XYZ", func(b *testing.B) {
+		a := New{{$.Prefix}}Vec4({{intList 4 1}})
+		v := a.XYZ()
+		for b.Loop() { v = a.XYZ() }
+		_ = v
+	})
 {{- end}}
 {{end}}
 {{- range $i := seq 3}}{{$n := add $i 2}}{{$n2 := mul $n $n}}
-// {{$.Prefix}}Mat{{$n}} benchmarks
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Add(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Sub(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Scale(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Mul(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-	for b.Loop() {
-		a = a.Mul(c)
-	}
-	_ = a
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}MulVec{{$n}}(b *testing.B) {
-	m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	v := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-	for b.Loop() {
-		v = m.MulVec{{$n}}(v)
-	}
-	_ = v
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Transpose(b *testing.B) {
-	m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	for b.Loop() {
-		m = m.Transpose()
-	}
-	_ = m
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Det(b *testing.B) {
-	m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
-	var r {{$.ElemType}}
-	for b.Loop() {
-		r = m.Det()
-	}
-	_ = r
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Inverse(b *testing.B) {
-	m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
-	inv := m.Inverse()
-	for b.Loop() {
-		inv = m.Inverse()
-	}
-	_ = inv
-}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Eq(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
+	b.Run("Mat{{$n}}/Add", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
+		for b.Loop() { a = a.Add(c) }
+		_ = a
+	})
+	b.Run("Mat{{$n}}/Sub", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
+		for b.Loop() { a = a.Sub(c) }
+		_ = a
+	})
+	b.Run("Mat{{$n}}/Scale", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		for b.Loop() { a = a.Scale(2) }
+		_ = a
+	})
+	b.Run("Mat{{$n}}/Transpose", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		for b.Loop() { m = m.Transpose() }
+		_ = m
+	})
+	b.Run("Mat{{$n}}/Eq", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		var r bool
+		for b.Loop() { r = a.Eq(c) }
+		_ = r
+	})
 {{- if $.HasMatApproxEq}}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}ApproxEq(b *testing.B) {
-	a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	var r bool
-	for b.Loop() {
-		r = a.ApproxEq(c, {{$.Epsilon}})
-	}
-	_ = r
-}
+	b.Run("Mat{{$n}}/ApproxEq", func(b *testing.B) {
+		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		var r bool
+		for b.Loop() { r = a.ApproxEq(c, {{$.Epsilon}}) }
+		_ = r
+	})
 {{- end}}
 {{- if $.HasFloat32}}
-
-func Benchmark{{$.Prefix}}Mat{{$n}}Float32(b *testing.B) {
-	m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-	var r Mat{{$n}}
-	for b.Loop() {
-		r = m.Float32()
-	}
-	_ = r
-}
+	b.Run("Mat{{$n}}/Float32", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+		var r Mat{{$n}}
+		for b.Loop() { r = m.Float32() }
+		_ = r
+	})
 {{- end}}
 {{- if and (eq $n 4) $.HasMat3}}
-
-func Benchmark{{$.Prefix}}Mat4Mat3(b *testing.B) {
-	m := New{{$.Prefix}}Mat4({{intList 16 1}})
-	r := m.Mat3()
-	for b.Loop() {
-		r = m.Mat3()
-	}
-	_ = r
-}
+	b.Run("Mat4/Mat3", func(b *testing.B) {
+		m := New{{$.Prefix}}Mat4({{intList 16 1}})
+		r := m.Mat3()
+		for b.Loop() { r = m.Mat3() }
+		_ = r
+	})
 {{- end}}
-{{end}}
+{{end -}}
+}

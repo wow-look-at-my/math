@@ -4,623 +4,561 @@ package math
 
 import "testing"
 
-// I8Vec2 benchmarks
-
-func BenchmarkI8Vec2Add(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(3, 4)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec2Sub(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(3, 4)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec2Scale(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec2Dot(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(3, 4)
-	var r int8
-	for b.Loop() {
-		r = a.Dot(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec2LenSq(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	var r int8
-	for b.Loop() {
-		r = a.LenSq()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec2Len(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	var r float32
-	for b.Loop() {
-		r = a.Len()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec2Normalize(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	v := a.Normalize()
-	for b.Loop() {
-		v = a.Normalize()
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec2Lerp(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(3, 4)
-	v := a.Lerp(c, 0.5)
-	for b.Loop() {
-		v = a.Lerp(c, 0.5)
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec2Dist(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(3, 4)
-	var r float32
-	for b.Loop() {
-		r = a.Dist(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec2Eq(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	c := NewI8Vec2(1, 2)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec2Float32(b *testing.B) {
-	a := NewI8Vec2(1, 2)
-	var r Vec2
-	for b.Loop() {
-		r = a.Float32()
-	}
-	_ = r
-}
-
-// I8Vec3 benchmarks
-
-func BenchmarkI8Vec3Add(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec3Sub(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec3Scale(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec3Dot(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	var r int8
-	for b.Loop() {
-		r = a.Dot(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3LenSq(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	var r int8
-	for b.Loop() {
-		r = a.LenSq()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3Len(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	var r float32
-	for b.Loop() {
-		r = a.Len()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3Normalize(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	v := a.Normalize()
-	for b.Loop() {
-		v = a.Normalize()
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec3Lerp(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	v := a.Lerp(c, 0.5)
-	for b.Loop() {
-		v = a.Lerp(c, 0.5)
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec3Dist(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	var r float32
-	for b.Loop() {
-		r = a.Dist(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3Eq(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(1, 2, 3)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3Float32(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	var r Vec3
-	for b.Loop() {
-		r = a.Float32()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec3Cross(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	c := NewI8Vec3(4, 5, 6)
-	for b.Loop() {
-		a = a.Cross(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec3XY(b *testing.B) {
-	a := NewI8Vec3(1, 2, 3)
-	v := a.XY()
-	for b.Loop() {
-		v = a.XY()
-	}
-	_ = v
-}
-
-// I8Vec4 benchmarks
-
-func BenchmarkI8Vec4Add(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(5, 6, 7, 8)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec4Sub(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(5, 6, 7, 8)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec4Scale(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Vec4Dot(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(5, 6, 7, 8)
-	var r int8
-	for b.Loop() {
-		r = a.Dot(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4LenSq(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	var r int8
-	for b.Loop() {
-		r = a.LenSq()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4Len(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	var r float32
-	for b.Loop() {
-		r = a.Len()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4Normalize(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	v := a.Normalize()
-	for b.Loop() {
-		v = a.Normalize()
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec4Lerp(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(5, 6, 7, 8)
-	v := a.Lerp(c, 0.5)
-	for b.Loop() {
-		v = a.Lerp(c, 0.5)
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec4Dist(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(5, 6, 7, 8)
-	var r float32
-	for b.Loop() {
-		r = a.Dist(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4Eq(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	c := NewI8Vec4(1, 2, 3, 4)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4Float32(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	var r Vec4
-	for b.Loop() {
-		r = a.Float32()
-	}
-	_ = r
-}
-
-func BenchmarkI8Vec4XY(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	v := a.XY()
-	for b.Loop() {
-		v = a.XY()
-	}
-	_ = v
-}
-
-func BenchmarkI8Vec4XYZ(b *testing.B) {
-	a := NewI8Vec4(1, 2, 3, 4)
-	v := a.XYZ()
-	for b.Loop() {
-		v = a.XYZ()
-	}
-	_ = v
-}
-
-// I8Mat2 benchmarks
-
-func BenchmarkI8Mat2Add(b *testing.B) {
-	a := NewI8Mat2(1, 2, 3, 4)
-	c := NewI8Mat2(5, 6, 7, 8)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat2Sub(b *testing.B) {
-	a := NewI8Mat2(1, 2, 3, 4)
-	c := NewI8Mat2(5, 6, 7, 8)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat2Scale(b *testing.B) {
-	a := NewI8Mat2(1, 2, 3, 4)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat2Mul(b *testing.B) {
-	a := NewI8Mat2(1, 2, 3, 4)
-	c := NewI8Mat2(5, 6, 7, 8)
-	for b.Loop() {
-		a = a.Mul(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat2MulVec2(b *testing.B) {
-	m := NewI8Mat2(1, 2, 3, 4)
-	v := NewI8Vec2(1, 2)
-	for b.Loop() {
-		v = m.MulVec2(v)
-	}
-	_ = v
-}
-
-func BenchmarkI8Mat2Transpose(b *testing.B) {
-	m := NewI8Mat2(1, 2, 3, 4)
-	for b.Loop() {
-		m = m.Transpose()
-	}
-	_ = m
-}
-
-func BenchmarkI8Mat2Det(b *testing.B) {
-	m := NewI8Mat2(1, 2, 3, 4)
-	var r int8
-	for b.Loop() {
-		r = m.Det()
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat2Inverse(b *testing.B) {
-	m := NewI8Mat2(1, 2, 3, 4)
-	inv := m.Inverse()
-	for b.Loop() {
-		inv = m.Inverse()
-	}
-	_ = inv
-}
-
-func BenchmarkI8Mat2Eq(b *testing.B) {
-	a := NewI8Mat2(1, 2, 3, 4)
-	c := NewI8Mat2(1, 2, 3, 4)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat2Float32(b *testing.B) {
-	m := NewI8Mat2(1, 2, 3, 4)
-	var r Mat2
-	for b.Loop() {
-		r = m.Float32()
-	}
-	_ = r
-}
-
-// I8Mat3 benchmarks
-
-func BenchmarkI8Mat3Add(b *testing.B) {
-	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat3Sub(b *testing.B) {
-	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat3Scale(b *testing.B) {
-	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat3Mul(b *testing.B) {
-	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-	for b.Loop() {
-		a = a.Mul(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat3MulVec3(b *testing.B) {
-	m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	v := NewI8Vec3(1, 2, 3)
-	for b.Loop() {
-		v = m.MulVec3(v)
-	}
-	_ = v
-}
-
-func BenchmarkI8Mat3Transpose(b *testing.B) {
-	m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	for b.Loop() {
-		m = m.Transpose()
-	}
-	_ = m
-}
-
-func BenchmarkI8Mat3Det(b *testing.B) {
-	m := NewI8Mat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
-	var r int8
-	for b.Loop() {
-		r = m.Det()
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat3Inverse(b *testing.B) {
-	m := NewI8Mat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
-	inv := m.Inverse()
-	for b.Loop() {
-		inv = m.Inverse()
-	}
-	_ = inv
-}
-
-func BenchmarkI8Mat3Eq(b *testing.B) {
-	a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	c := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat3Float32(b *testing.B) {
-	m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-	var r Mat3
-	for b.Loop() {
-		r = m.Float32()
-	}
-	_ = r
-}
-
-// I8Mat4 benchmarks
-
-func BenchmarkI8Mat4Add(b *testing.B) {
-	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-	for b.Loop() {
-		a = a.Add(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat4Sub(b *testing.B) {
-	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-	for b.Loop() {
-		a = a.Sub(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat4Scale(b *testing.B) {
-	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	for b.Loop() {
-		a = a.Scale(2)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat4Mul(b *testing.B) {
-	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-	for b.Loop() {
-		a = a.Mul(c)
-	}
-	_ = a
-}
-
-func BenchmarkI8Mat4MulVec4(b *testing.B) {
-	m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	v := NewI8Vec4(1, 2, 3, 4)
-	for b.Loop() {
-		v = m.MulVec4(v)
-	}
-	_ = v
-}
-
-func BenchmarkI8Mat4Transpose(b *testing.B) {
-	m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	for b.Loop() {
-		m = m.Transpose()
-	}
-	_ = m
-}
-
-func BenchmarkI8Mat4Det(b *testing.B) {
-	m := NewI8Mat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
-	var r int8
-	for b.Loop() {
-		r = m.Det()
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat4Inverse(b *testing.B) {
-	m := NewI8Mat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
-	inv := m.Inverse()
-	for b.Loop() {
-		inv = m.Inverse()
-	}
-	_ = inv
-}
-
-func BenchmarkI8Mat4Eq(b *testing.B) {
-	a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	c := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	var r bool
-	for b.Loop() {
-		r = a.Eq(c)
-	}
-	_ = r
-}
-
-func BenchmarkI8Mat4Float32(b *testing.B) {
-	m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-	var r Mat4
-	for b.Loop() {
-		r = m.Float32()
-	}
-	_ = r
+func BenchmarkI8Inverse(b *testing.B) {
+	b.Run("Mat2", func(b *testing.B) {
+		m := NewI8Mat2(1, 2, 3, 4)
+		inv := m.Inverse()
+		for b.Loop() {
+			inv = m.Inverse()
+		}
+		_ = inv
+	})
+	b.Run("Mat3", func(b *testing.B) {
+		m := NewI8Mat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
+		inv := m.Inverse()
+		for b.Loop() {
+			inv = m.Inverse()
+		}
+		_ = inv
+	})
+	b.Run("Mat4", func(b *testing.B) {
+		m := NewI8Mat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
+		inv := m.Inverse()
+		for b.Loop() {
+			inv = m.Inverse()
+		}
+		_ = inv
+	})
+}
+
+func BenchmarkI8Mul(b *testing.B) {
+	b.Run("Mat2", func(b *testing.B) {
+		a := NewI8Mat2(1, 2, 3, 4)
+		c := NewI8Mat2(5, 6, 7, 8)
+		for b.Loop() {
+			a = a.Mul(c)
+		}
+		_ = a
+	})
+	b.Run("Mat2Vec2", func(b *testing.B) {
+		m := NewI8Mat2(1, 2, 3, 4)
+		v := NewI8Vec2(1, 2)
+		for b.Loop() {
+			v = m.MulVec2(v)
+		}
+		_ = v
+	})
+	b.Run("Mat3", func(b *testing.B) {
+		a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
+		for b.Loop() {
+			a = a.Mul(c)
+		}
+		_ = a
+	})
+	b.Run("Mat3Vec3", func(b *testing.B) {
+		m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		v := NewI8Vec3(1, 2, 3)
+		for b.Loop() {
+			v = m.MulVec3(v)
+		}
+		_ = v
+	})
+	b.Run("Mat4", func(b *testing.B) {
+		a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
+		for b.Loop() {
+			a = a.Mul(c)
+		}
+		_ = a
+	})
+	b.Run("Mat4Vec4", func(b *testing.B) {
+		m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		v := NewI8Vec4(1, 2, 3, 4)
+		for b.Loop() {
+			v = m.MulVec4(v)
+		}
+		_ = v
+	})
+}
+
+func BenchmarkI8Det(b *testing.B) {
+	b.Run("Mat2", func(b *testing.B) {
+		m := NewI8Mat2(1, 2, 3, 4)
+		var r int8
+		for b.Loop() {
+			r = m.Det()
+		}
+		_ = r
+	})
+	b.Run("Mat3", func(b *testing.B) {
+		m := NewI8Mat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
+		var r int8
+		for b.Loop() {
+			r = m.Det()
+		}
+		_ = r
+	})
+	b.Run("Mat4", func(b *testing.B) {
+		m := NewI8Mat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
+		var r int8
+		for b.Loop() {
+			r = m.Det()
+		}
+		_ = r
+	})
+}
+
+func BenchmarkI8Ops(b *testing.B) {
+	b.Run("Vec2/Add", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(3, 4)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Vec2/Sub", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(3, 4)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Vec2/Scale", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Vec2/Dot", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(3, 4)
+		var r int8
+		for b.Loop() {
+			r = a.Dot(c)
+		}
+		_ = r
+	})
+	b.Run("Vec2/LenSq", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		var r int8
+		for b.Loop() {
+			r = a.LenSq()
+		}
+		_ = r
+	})
+	b.Run("Vec2/Len", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		var r float32
+		for b.Loop() {
+			r = a.Len()
+		}
+		_ = r
+	})
+	b.Run("Vec2/Normalize", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		v := a.Normalize()
+		for b.Loop() {
+			v = a.Normalize()
+		}
+		_ = v
+	})
+	b.Run("Vec2/Lerp", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(3, 4)
+		v := a.Lerp(c, 0.5)
+		for b.Loop() {
+			v = a.Lerp(c, 0.5)
+		}
+		_ = v
+	})
+	b.Run("Vec2/Dist", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(3, 4)
+		var r float32
+		for b.Loop() {
+			r = a.Dist(c)
+		}
+		_ = r
+	})
+	b.Run("Vec2/Eq", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		c := NewI8Vec2(1, 2)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Vec2/Float32", func(b *testing.B) {
+		a := NewI8Vec2(1, 2)
+		var r Vec2
+		for b.Loop() {
+			r = a.Float32()
+		}
+		_ = r
+	})
+
+	b.Run("Vec3/Add", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Vec3/Sub", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Vec3/Scale", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Vec3/Dot", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		var r int8
+		for b.Loop() {
+			r = a.Dot(c)
+		}
+		_ = r
+	})
+	b.Run("Vec3/LenSq", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		var r int8
+		for b.Loop() {
+			r = a.LenSq()
+		}
+		_ = r
+	})
+	b.Run("Vec3/Len", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		var r float32
+		for b.Loop() {
+			r = a.Len()
+		}
+		_ = r
+	})
+	b.Run("Vec3/Normalize", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		v := a.Normalize()
+		for b.Loop() {
+			v = a.Normalize()
+		}
+		_ = v
+	})
+	b.Run("Vec3/Lerp", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		v := a.Lerp(c, 0.5)
+		for b.Loop() {
+			v = a.Lerp(c, 0.5)
+		}
+		_ = v
+	})
+	b.Run("Vec3/Dist", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		var r float32
+		for b.Loop() {
+			r = a.Dist(c)
+		}
+		_ = r
+	})
+	b.Run("Vec3/Eq", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(1, 2, 3)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Vec3/Float32", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		var r Vec3
+		for b.Loop() {
+			r = a.Float32()
+		}
+		_ = r
+	})
+	b.Run("Vec3/Cross", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		c := NewI8Vec3(4, 5, 6)
+		for b.Loop() {
+			a = a.Cross(c)
+		}
+		_ = a
+	})
+	b.Run("Vec3/XY", func(b *testing.B) {
+		a := NewI8Vec3(1, 2, 3)
+		v := a.XY()
+		for b.Loop() {
+			v = a.XY()
+		}
+		_ = v
+	})
+
+	b.Run("Vec4/Add", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(5, 6, 7, 8)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Vec4/Sub", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(5, 6, 7, 8)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Vec4/Scale", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Vec4/Dot", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(5, 6, 7, 8)
+		var r int8
+		for b.Loop() {
+			r = a.Dot(c)
+		}
+		_ = r
+	})
+	b.Run("Vec4/LenSq", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		var r int8
+		for b.Loop() {
+			r = a.LenSq()
+		}
+		_ = r
+	})
+	b.Run("Vec4/Len", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		var r float32
+		for b.Loop() {
+			r = a.Len()
+		}
+		_ = r
+	})
+	b.Run("Vec4/Normalize", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		v := a.Normalize()
+		for b.Loop() {
+			v = a.Normalize()
+		}
+		_ = v
+	})
+	b.Run("Vec4/Lerp", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(5, 6, 7, 8)
+		v := a.Lerp(c, 0.5)
+		for b.Loop() {
+			v = a.Lerp(c, 0.5)
+		}
+		_ = v
+	})
+	b.Run("Vec4/Dist", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(5, 6, 7, 8)
+		var r float32
+		for b.Loop() {
+			r = a.Dist(c)
+		}
+		_ = r
+	})
+	b.Run("Vec4/Eq", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		c := NewI8Vec4(1, 2, 3, 4)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Vec4/Float32", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		var r Vec4
+		for b.Loop() {
+			r = a.Float32()
+		}
+		_ = r
+	})
+	b.Run("Vec4/XY", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		v := a.XY()
+		for b.Loop() {
+			v = a.XY()
+		}
+		_ = v
+	})
+	b.Run("Vec4/XYZ", func(b *testing.B) {
+		a := NewI8Vec4(1, 2, 3, 4)
+		v := a.XYZ()
+		for b.Loop() {
+			v = a.XYZ()
+		}
+		_ = v
+	})
+
+	b.Run("Mat2/Add", func(b *testing.B) {
+		a := NewI8Mat2(1, 2, 3, 4)
+		c := NewI8Mat2(5, 6, 7, 8)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Mat2/Sub", func(b *testing.B) {
+		a := NewI8Mat2(1, 2, 3, 4)
+		c := NewI8Mat2(5, 6, 7, 8)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Mat2/Scale", func(b *testing.B) {
+		a := NewI8Mat2(1, 2, 3, 4)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Mat2/Transpose", func(b *testing.B) {
+		m := NewI8Mat2(1, 2, 3, 4)
+		for b.Loop() {
+			m = m.Transpose()
+		}
+		_ = m
+	})
+	b.Run("Mat2/Eq", func(b *testing.B) {
+		a := NewI8Mat2(1, 2, 3, 4)
+		c := NewI8Mat2(1, 2, 3, 4)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Mat2/Float32", func(b *testing.B) {
+		m := NewI8Mat2(1, 2, 3, 4)
+		var r Mat2
+		for b.Loop() {
+			r = m.Float32()
+		}
+		_ = r
+	})
+
+	b.Run("Mat3/Add", func(b *testing.B) {
+		a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Mat3/Sub", func(b *testing.B) {
+		a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		c := NewI8Mat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Mat3/Scale", func(b *testing.B) {
+		a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Mat3/Transpose", func(b *testing.B) {
+		m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		for b.Loop() {
+			m = m.Transpose()
+		}
+		_ = m
+	})
+	b.Run("Mat3/Eq", func(b *testing.B) {
+		a := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		c := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Mat3/Float32", func(b *testing.B) {
+		m := NewI8Mat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+		var r Mat3
+		for b.Loop() {
+			r = m.Float32()
+		}
+		_ = r
+	})
+
+	b.Run("Mat4/Add", func(b *testing.B) {
+		a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
+		for b.Loop() {
+			a = a.Add(c)
+		}
+		_ = a
+	})
+	b.Run("Mat4/Sub", func(b *testing.B) {
+		a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		c := NewI8Mat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
+		for b.Loop() {
+			a = a.Sub(c)
+		}
+		_ = a
+	})
+	b.Run("Mat4/Scale", func(b *testing.B) {
+		a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		for b.Loop() {
+			a = a.Scale(2)
+		}
+		_ = a
+	})
+	b.Run("Mat4/Transpose", func(b *testing.B) {
+		m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		for b.Loop() {
+			m = m.Transpose()
+		}
+		_ = m
+	})
+	b.Run("Mat4/Eq", func(b *testing.B) {
+		a := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		c := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		var r bool
+		for b.Loop() {
+			r = a.Eq(c)
+		}
+		_ = r
+	})
+	b.Run("Mat4/Float32", func(b *testing.B) {
+		m := NewI8Mat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+		var r Mat4
+		for b.Loop() {
+			r = m.Float32()
+		}
+		_ = r
+	})
 }
