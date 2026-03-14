@@ -82,8 +82,7 @@ func (a {{.Prefix}}Vec{{.N}}) Lerp(b {{.Prefix}}Vec{{.N}}, t float32) Vec{{.N}} 
 }
 
 func (a {{.Prefix}}Vec{{.N}}) Dist(b {{.Prefix}}Vec{{.N}}) float32 {
-	d := a.Sub(b)
-	return d.Len()
+	return float32(math.Sqrt({{range $i := seq .N}}{{if $i}} + {{end}}(float64(a.{{component $i}})-float64(b.{{component $i}}))*(float64(a.{{component $i}})-float64(b.{{component $i}})){{end}}))
 }
 
 func (a {{.Prefix}}Vec{{.N}}) Eq(b {{.Prefix}}Vec{{.N}}) bool {

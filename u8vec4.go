@@ -78,8 +78,7 @@ func (a U8Vec4) Lerp(b U8Vec4, t float32) Vec4 {
 }
 
 func (a U8Vec4) Dist(b U8Vec4) float32 {
-	d := a.Sub(b)
-	return d.Len()
+	return float32(math.Sqrt((float64(a.X)-float64(b.X))*(float64(a.X)-float64(b.X)) + (float64(a.Y)-float64(b.Y))*(float64(a.Y)-float64(b.Y)) + (float64(a.Z)-float64(b.Z))*(float64(a.Z)-float64(b.Z)) + (float64(a.W)-float64(b.W))*(float64(a.W)-float64(b.W))))
 }
 
 func (a U8Vec4) Eq(b U8Vec4) bool {

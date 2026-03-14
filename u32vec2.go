@@ -66,8 +66,7 @@ func (a U32Vec2) Lerp(b U32Vec2, t float32) Vec2 {
 }
 
 func (a U32Vec2) Dist(b U32Vec2) float32 {
-	d := a.Sub(b)
-	return d.Len()
+	return float32(math.Sqrt((float64(a.X)-float64(b.X))*(float64(a.X)-float64(b.X)) + (float64(a.Y)-float64(b.Y))*(float64(a.Y)-float64(b.Y))))
 }
 
 func (a U32Vec2) Eq(b U32Vec2) bool {

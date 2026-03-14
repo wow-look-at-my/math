@@ -78,8 +78,7 @@ func (a I64Vec4) Lerp(b I64Vec4, t float32) Vec4 {
 }
 
 func (a I64Vec4) Dist(b I64Vec4) float32 {
-	d := a.Sub(b)
-	return d.Len()
+	return float32(math.Sqrt((float64(a.X)-float64(b.X))*(float64(a.X)-float64(b.X)) + (float64(a.Y)-float64(b.Y))*(float64(a.Y)-float64(b.Y)) + (float64(a.Z)-float64(b.Z))*(float64(a.Z)-float64(b.Z)) + (float64(a.W)-float64(b.W))*(float64(a.W)-float64(b.W))))
 }
 
 func (a I64Vec4) Eq(b I64Vec4) bool {

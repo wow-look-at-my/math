@@ -49,6 +49,12 @@ type imatData struct {
 	ElemType string
 }
 
+type itestData struct {
+	Prefix   string
+	ElemType string
+	Signed   bool
+}
+
 // genDir returns the directory containing this source file,
 // which is where the .tmpl files live.
 func genDir() string {
@@ -90,6 +96,9 @@ func main() {
 	imatTmpl := template.Must(
 		template.New("imat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "imat.go.tmpl")),
 	)
+	itestTmpl := template.Must(
+		template.New("itest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "itest.go.tmpl")),
+	)
 
 	// Generate generic + float concrete types.
 	for _, n := range []int{2, 3, 4} {
@@ -110,15 +119,16 @@ func main() {
 	intTypes := []struct {
 		Prefix string
 		GoType string
+		Signed bool
 	}{
-		{"I8", "int8"},
-		{"I16", "int16"},
-		{"I32", "int32"},
-		{"I64", "int64"},
-		{"U8", "uint8"},
-		{"U16", "uint16"},
-		{"U32", "uint32"},
-		{"U64", "uint64"},
+		{"I8", "int8", true},
+		{"I16", "int16", true},
+		{"I32", "int32", true},
+		{"I64", "int64", true},
+		{"U8", "uint8", false},
+		{"U16", "uint16", false},
+		{"U32", "uint32", false},
+		{"U64", "uint64", false},
 	}
 
 	for _, it := range intTypes {
@@ -142,6 +152,16 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				os.Exit(1)
 			}
+		}
+
+		// Generate test file for this integer type.
+		if err := generateFile(itestTmpl, fmt.Sprintf("%s_test.go", prefix), itestData{
+			Prefix:   it.Prefix,
+			ElemType: it.GoType,
+			Signed:   it.Signed,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 	}
 }
