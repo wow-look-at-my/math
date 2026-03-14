@@ -3,6 +3,7 @@ package math
 import (
 	stdmath "math"
 	"testing"
+	"github.com/wow-look-at-my/testify/assert"
 )
 
 func TestNewMat4(t *testing.T) {
@@ -12,9 +13,8 @@ func TestNewMat4(t *testing.T) {
 		9, 10, 11, 12,
 		13, 14, 15, 16,
 	)
-	if m.At(0, 0) != 1 || m.At(0, 3) != 4 || m.At(3, 0) != 13 || m.At(3, 3) != 16 {
-		t.Errorf("NewMat4 element access incorrect")
-	}
+	assert.False(t, m.At(0, 0) != 1 || m.At(0, 3) != 4 || m.At(3, 0) != 13 || m.At(3, 3) != 16)
+
 }
 
 func TestMat4Identity(t *testing.T) {
@@ -25,9 +25,8 @@ func TestMat4Identity(t *testing.T) {
 			if r == c {
 				want = 1
 			}
-			if m.At(r, c) != want {
-				t.Errorf("Identity at (%d,%d): got %v, want %v", r, c, m.At(r, c), want)
-			}
+			assert.Equal(t, want, m.At(r, c))
+
 		}
 	}
 }
@@ -41,9 +40,8 @@ func TestMat4Col(t *testing.T) {
 	)
 	got := m.Col(2)
 	want := NewVec4(3, 7, 11, 15)
-	if !got.Eq(want) {
-		t.Errorf("Col(2): got %v, want %v", got, want)
-	}
+	assert.True(t, got.Eq(want))
+
 }
 
 func TestMat4Row(t *testing.T) {
@@ -55,9 +53,8 @@ func TestMat4Row(t *testing.T) {
 	)
 	got := m.Row(2)
 	want := NewVec4(9, 10, 11, 12)
-	if !got.Eq(want) {
-		t.Errorf("Row(2): got %v, want %v", got, want)
-	}
+	assert.True(t, got.Eq(want))
+
 }
 
 func TestMat4Add(t *testing.T) {
@@ -67,9 +64,8 @@ func TestMat4Add(t *testing.T) {
 	for r := 0; r < 4; r++ {
 		for c := 0; c < 4; c++ {
 			want := a.At(r, c) * 2
-			if got.At(r, c) != want {
-				t.Errorf("Add at (%d,%d): got %v, want %v", r, c, got.At(r, c), want)
-			}
+			assert.Equal(t, want, got.At(r, c))
+
 		}
 	}
 }
@@ -78,9 +74,8 @@ func TestMat4Sub(t *testing.T) {
 	a := Mat4Identity()
 	got := a.Sub(a)
 	zero := TMat4[float32]{}
-	if got != zero {
-		t.Errorf("Sub self: got %v, want zero", got)
-	}
+	assert.Equal(t, zero, got)
+
 }
 
 func TestMat4Scale(t *testing.T) {
@@ -89,9 +84,8 @@ func TestMat4Scale(t *testing.T) {
 	for r := 0; r < 4; r++ {
 		for c := 0; c < 4; c++ {
 			want := m.At(r, c) * 3
-			if got.At(r, c) != want {
-				t.Errorf("Scale at (%d,%d): got %v, want %v", r, c, got.At(r, c), want)
-			}
+			assert.Equal(t, want, got.At(r, c))
+
 		}
 	}
 }
@@ -104,18 +98,16 @@ func TestMat4Mul(t *testing.T) {
 		13, 14, 15, 16,
 	)
 	got := m.Mul(Mat4Identity())
-	if got != m {
-		t.Errorf("Mul identity: got %v, want %v", got, m)
-	}
+	assert.Equal(t, m, got)
+
 }
 
 func TestMat4MulVec4(t *testing.T) {
 	m := Mat4Identity()
 	v := NewVec4(1, 2, 3, 4)
 	got := m.MulVec4(v)
-	if !got.Eq(v) {
-		t.Errorf("MulVec4 identity: got %v, want %v", got, v)
-	}
+	assert.True(t, got.Eq(v))
+
 }
 
 func TestMat4Transpose(t *testing.T) {
@@ -132,9 +124,8 @@ func TestMat4Transpose(t *testing.T) {
 		3, 7, 11, 15,
 		4, 8, 12, 16,
 	)
-	if got != want {
-		t.Errorf("Transpose: got %v, want %v", got, want)
-	}
+	assert.Equal(t, want, got)
+
 }
 
 func TestMat4TransposeDouble(t *testing.T) {
@@ -145,9 +136,8 @@ func TestMat4TransposeDouble(t *testing.T) {
 		13, 14, 15, 16,
 	)
 	got := m.Transpose().Transpose()
-	if got != m {
-		t.Errorf("Double transpose should equal original")
-	}
+	assert.Equal(t, m, got)
+
 }
 
 func TestMat4Det(t *testing.T) {
@@ -159,9 +149,8 @@ func TestMat4Det(t *testing.T) {
 	)
 	got := m.Det()
 	var want float32 = 24
-	if got != want {
-		t.Errorf("Det diagonal: got %v, want %v", got, want)
-	}
+	assert.Equal(t, want, got)
+
 }
 
 func TestMat4Inverse(t *testing.T) {
@@ -177,9 +166,8 @@ func TestMat4Inverse(t *testing.T) {
 	for r := 0; r < 4; r++ {
 		for c := 0; c < 4; c++ {
 			diff := product.At(r, c) - identity.At(r, c)
-			if diff > 1e-4 || diff < -1e-4 {
-				t.Errorf("M*M^-1 != I at (%d,%d): got %v", r, c, product.At(r, c))
-			}
+			assert.False(t, diff > 1e-4 || diff < -1e-4)
+
 		}
 	}
 }
@@ -193,9 +181,8 @@ func TestMat4InverseSingular(t *testing.T) {
 	)
 	got := m.Inverse()
 	zero := TMat4[float32]{}
-	if got != zero {
-		t.Errorf("Inverse of singular matrix: got %v, want zero", got)
-	}
+	assert.Equal(t, zero, got)
+
 }
 
 func TestMat4Mat3(t *testing.T) {
@@ -207,9 +194,8 @@ func TestMat4Mat3(t *testing.T) {
 	)
 	got := m.Mat3()
 	want := NewMat3(1, 2, 3, 5, 6, 7, 9, 10, 11)
-	if got != want {
-		t.Errorf("Mat3: got %v, want %v", got, want)
-	}
+	assert.Equal(t, want, got)
+
 }
 
 func TestTranslation(t *testing.T) {
@@ -217,9 +203,8 @@ func TestTranslation(t *testing.T) {
 	v := NewVec4(1, 1, 1, 1)
 	got := m.MulVec4(v)
 	want := NewVec4(3, 4, 5, 1)
-	if !got.Eq(want) {
-		t.Errorf("Translation: got %v, want %v", got, want)
-	}
+	assert.True(t, got.Eq(want))
+
 }
 
 func TestScaling(t *testing.T) {
@@ -227,9 +212,8 @@ func TestScaling(t *testing.T) {
 	v := NewVec4(1, 1, 1, 1)
 	got := m.MulVec4(v)
 	want := NewVec4(2, 3, 4, 1)
-	if !got.Eq(want) {
-		t.Errorf("Scaling: got %v, want %v", got, want)
-	}
+	assert.True(t, got.Eq(want))
+
 }
 
 func TestRotationX(t *testing.T) {
@@ -237,9 +221,8 @@ func TestRotationX(t *testing.T) {
 	v := NewVec4(0, 1, 0, 1)
 	got := m.MulVec4(v)
 	want := NewVec4(0, 0, 1, 1)
-	if !got.ApproxEq(want, 1e-5) {
-		t.Errorf("RotationX: got %v, want %v", got, want)
-	}
+	assert.True(t, got.ApproxEq(want, 1e-5))
+
 }
 
 func TestRotationY(t *testing.T) {
@@ -247,9 +230,8 @@ func TestRotationY(t *testing.T) {
 	v := NewVec4(1, 0, 0, 1)
 	got := m.MulVec4(v)
 	want := NewVec4(0, 0, -1, 1)
-	if !got.ApproxEq(want, 1e-5) {
-		t.Errorf("RotationY: got %v, want %v", got, want)
-	}
+	assert.True(t, got.ApproxEq(want, 1e-5))
+
 }
 
 func TestRotationZ(t *testing.T) {
@@ -257,9 +239,8 @@ func TestRotationZ(t *testing.T) {
 	v := NewVec4(1, 0, 0, 1)
 	got := m.MulVec4(v)
 	want := NewVec4(0, 1, 0, 1)
-	if !got.ApproxEq(want, 1e-5) {
-		t.Errorf("RotationZ: got %v, want %v", got, want)
-	}
+	assert.True(t, got.ApproxEq(want, 1e-5))
+
 }
 
 func TestLookAt(t *testing.T) {
@@ -269,9 +250,8 @@ func TestLookAt(t *testing.T) {
 	m := LookAt(eye, center, up)
 	// Looking down -Z, the origin should map to (0,0,-5,1) in view space
 	v := m.MulVec4(NewVec4(0, 0, 0, 1))
-	if !v.ApproxEq(NewVec4(0, 0, -5, 1), 1e-5) {
-		t.Errorf("LookAt: origin in view space = %v, want (0,0,-5,1)", v)
-	}
+	assert.True(t, v.ApproxEq(NewVec4(0, 0, -5, 1), 1e-5))
+
 }
 
 func TestPerspective(t *testing.T) {
@@ -279,9 +259,8 @@ func TestPerspective(t *testing.T) {
 	// A point on the near plane center should map to z=-1 after perspective divide
 	v := m.MulVec4(NewVec4(0, 0, -0.1, 1))
 	ndc := v.Scale(1.0 / v.W())
-	if ndc.Z() < -1.01 || ndc.Z() > -0.99 {
-		t.Errorf("Perspective near plane: NDC z = %v, want ~-1", ndc.Z())
-	}
+	assert.False(t, ndc.Z() < -1.01 || ndc.Z() > -0.99)
+
 }
 
 func TestOrtho(t *testing.T) {
@@ -289,19 +268,15 @@ func TestOrtho(t *testing.T) {
 	// Center should map to origin
 	v := m.MulVec4(NewVec4(0, 0, 0, 1))
 	want := NewVec4(0, 0, 0, 1)
-	if !v.ApproxEq(want, 1e-5) {
-		t.Errorf("Ortho center: got %v, want %v", v, want)
-	}
+	assert.True(t, v.ApproxEq(want, 1e-5))
+
 }
 
 func TestUtilClamp(t *testing.T) {
-	if Clamp[float32](5, 0, 10) != 5 {
-		t.Error("Clamp: value in range should be unchanged")
-	}
-	if Clamp[float32](-1, 0, 10) != 0 {
-		t.Error("Clamp: value below min should be clamped to min")
-	}
-	if Clamp[float32](15, 0, 10) != 10 {
-		t.Error("Clamp: value above max should be clamped to max")
-	}
+	assert.Equal(t, float32(5), Clamp[float32](5, 0, 10))
+
+	assert.Equal(t, float32(0), Clamp[float32](-1, 0, 10))
+
+	assert.Equal(t, float32(10), Clamp[float32](15, 0, 10))
+
 }
