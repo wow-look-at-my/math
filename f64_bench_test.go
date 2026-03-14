@@ -5,622 +5,164 @@ package math
 import "testing"
 
 func BenchmarkF64Inverse(b *testing.B) {
-	b.Run("Mat2", func(b *testing.B) {
-		m := NewDMat2(1, 2, 3, 4)
-		inv := m.Inverse()
-		for b.Loop() {
-			inv = m.Inverse()
-		}
-		_ = inv
-	})
-	b.Run("Mat3", func(b *testing.B) {
-		m := NewDMat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
-		inv := m.Inverse()
-		for b.Loop() {
-			inv = m.Inverse()
-		}
-		_ = inv
-	})
-	b.Run("Mat4", func(b *testing.B) {
-		m := NewDMat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
-		inv := m.Inverse()
-		for b.Loop() {
-			inv = m.Inverse()
-		}
-		_ = inv
-	})
+	m2 := NewDMat2(1, 2, 3, 4)
+	m3 := NewDMat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
+	m4 := NewDMat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
+	for b.Loop() {
+		_ = m2.Inverse()
+		_ = m3.Inverse()
+		_ = m4.Inverse()
+	}
 }
 
 func BenchmarkF64Mul(b *testing.B) {
-	b.Run("Mat2", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		c := NewDMat2(5, 6, 7, 8)
-		for b.Loop() {
-			a = a.Mul(c)
-		}
-		_ = a
-	})
-	b.Run("Mat2Vec2", func(b *testing.B) {
-		m := NewDMat2(1, 2, 3, 4)
-		v := NewDVec2(1, 2)
-		for b.Loop() {
-			v = m.MulVec2(v)
-		}
-		_ = v
-	})
-	b.Run("Mat3", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-		for b.Loop() {
-			a = a.Mul(c)
-		}
-		_ = a
-	})
-	b.Run("Mat3Vec3", func(b *testing.B) {
-		m := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		v := NewDVec3(1, 2, 3)
-		for b.Loop() {
-			v = m.MulVec3(v)
-		}
-		_ = v
-	})
-	b.Run("Mat4", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-		for b.Loop() {
-			a = a.Mul(c)
-		}
-		_ = a
-	})
-	b.Run("Mat4Vec4", func(b *testing.B) {
-		m := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		v := NewDVec4(1, 2, 3, 4)
-		for b.Loop() {
-			v = m.MulVec4(v)
-		}
-		_ = v
-	})
+	m2 := NewDMat2(1, 2, 3, 4)
+	m2b := NewDMat2(5, 6, 7, 8)
+	v2 := NewDVec2(1, 2)
+	m3 := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	m3b := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
+	v3 := NewDVec3(1, 2, 3)
+	m4 := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	m4b := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
+	v4 := NewDVec4(1, 2, 3, 4)
+	for b.Loop() {
+		m2 = m2.Mul(m2b)
+		v2 = m2.MulVec2(v2)
+		m3 = m3.Mul(m3b)
+		v3 = m3.MulVec3(v3)
+		m4 = m4.Mul(m4b)
+		v4 = m4.MulVec4(v4)
+	}
+	_ = m2
+	_ = v2
+	_ = m3
+	_ = v3
+	_ = m4
+	_ = v4
 }
 
 func BenchmarkF64Det(b *testing.B) {
-	b.Run("Mat2", func(b *testing.B) {
-		m := NewDMat2(1, 2, 3, 4)
-		var r float64
-		for b.Loop() {
-			r = m.Det()
-		}
-		_ = r
-	})
-	b.Run("Mat3", func(b *testing.B) {
-		m := NewDMat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
-		var r float64
-		for b.Loop() {
-			r = m.Det()
-		}
-		_ = r
-	})
-	b.Run("Mat4", func(b *testing.B) {
-		m := NewDMat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
-		var r float64
-		for b.Loop() {
-			r = m.Det()
-		}
-		_ = r
-	})
+	m2 := NewDMat2(1, 2, 3, 4)
+	var d2 float64
+	m3 := NewDMat3(1, 2, 3, 0, 1, 4, 5, 6, 0)
+	var d3 float64
+	m4 := NewDMat4(1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1)
+	var d4 float64
+	for b.Loop() {
+		d2 = m2.Det()
+		d3 = m3.Det()
+		d4 = m4.Det()
+	}
+	_ = d2
+	_ = d3
+	_ = d4
 }
 
 func BenchmarkF64Ops(b *testing.B) {
-	b.Run("Vec2/Add", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(3, 4)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Vec2/Sub", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(3, 4)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Vec2/Scale", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Vec2/Dot", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(3, 4)
-		var r float64
-		for b.Loop() {
-			r = a.Dot(c)
-		}
-		_ = r
-	})
-	b.Run("Vec2/LenSq", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		var r float64
-		for b.Loop() {
-			r = a.LenSq()
-		}
-		_ = r
-	})
-	b.Run("Vec2/Len", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		var r float64
-		for b.Loop() {
-			r = a.Len()
-		}
-		_ = r
-	})
-	b.Run("Vec2/Normalize", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		v := a.Normalize()
-		for b.Loop() {
-			v = a.Normalize()
-		}
-		_ = v
-	})
-	b.Run("Vec2/Lerp", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(3, 4)
-		v := a.Lerp(c, 0.5)
-		for b.Loop() {
-			v = a.Lerp(c, 0.5)
-		}
-		_ = v
-	})
-	b.Run("Vec2/Dist", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(3, 4)
-		var r float64
-		for b.Loop() {
-			r = a.Dist(c)
-		}
-		_ = r
-	})
-	b.Run("Vec2/Eq", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(1, 2)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Vec2/ApproxEq", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		c := NewDVec2(1, 2)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Vec2/Float32", func(b *testing.B) {
-		a := NewDVec2(1, 2)
-		var r Vec2
-		for b.Loop() {
-			r = a.Float32()
-		}
-		_ = r
-	})
-
-	b.Run("Vec3/Add", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Vec3/Sub", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Vec3/Scale", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Vec3/Dot", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		var r float64
-		for b.Loop() {
-			r = a.Dot(c)
-		}
-		_ = r
-	})
-	b.Run("Vec3/LenSq", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		var r float64
-		for b.Loop() {
-			r = a.LenSq()
-		}
-		_ = r
-	})
-	b.Run("Vec3/Len", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		var r float64
-		for b.Loop() {
-			r = a.Len()
-		}
-		_ = r
-	})
-	b.Run("Vec3/Normalize", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		v := a.Normalize()
-		for b.Loop() {
-			v = a.Normalize()
-		}
-		_ = v
-	})
-	b.Run("Vec3/Lerp", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		v := a.Lerp(c, 0.5)
-		for b.Loop() {
-			v = a.Lerp(c, 0.5)
-		}
-		_ = v
-	})
-	b.Run("Vec3/Dist", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		var r float64
-		for b.Loop() {
-			r = a.Dist(c)
-		}
-		_ = r
-	})
-	b.Run("Vec3/Eq", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(1, 2, 3)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Vec3/ApproxEq", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(1, 2, 3)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Vec3/Float32", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		var r Vec3
-		for b.Loop() {
-			r = a.Float32()
-		}
-		_ = r
-	})
-	b.Run("Vec3/Cross", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		c := NewDVec3(4, 5, 6)
-		for b.Loop() {
-			a = a.Cross(c)
-		}
-		_ = a
-	})
-	b.Run("Vec3/XY", func(b *testing.B) {
-		a := NewDVec3(1, 2, 3)
-		v := a.XY()
-		for b.Loop() {
-			v = a.XY()
-		}
-		_ = v
-	})
-
-	b.Run("Vec4/Add", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(5, 6, 7, 8)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Vec4/Sub", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(5, 6, 7, 8)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Vec4/Scale", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Vec4/Dot", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(5, 6, 7, 8)
-		var r float64
-		for b.Loop() {
-			r = a.Dot(c)
-		}
-		_ = r
-	})
-	b.Run("Vec4/LenSq", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		var r float64
-		for b.Loop() {
-			r = a.LenSq()
-		}
-		_ = r
-	})
-	b.Run("Vec4/Len", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		var r float64
-		for b.Loop() {
-			r = a.Len()
-		}
-		_ = r
-	})
-	b.Run("Vec4/Normalize", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		v := a.Normalize()
-		for b.Loop() {
-			v = a.Normalize()
-		}
-		_ = v
-	})
-	b.Run("Vec4/Lerp", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(5, 6, 7, 8)
-		v := a.Lerp(c, 0.5)
-		for b.Loop() {
-			v = a.Lerp(c, 0.5)
-		}
-		_ = v
-	})
-	b.Run("Vec4/Dist", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(5, 6, 7, 8)
-		var r float64
-		for b.Loop() {
-			r = a.Dist(c)
-		}
-		_ = r
-	})
-	b.Run("Vec4/Eq", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(1, 2, 3, 4)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Vec4/ApproxEq", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		c := NewDVec4(1, 2, 3, 4)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Vec4/Float32", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		var r Vec4
-		for b.Loop() {
-			r = a.Float32()
-		}
-		_ = r
-	})
-	b.Run("Vec4/XY", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		v := a.XY()
-		for b.Loop() {
-			v = a.XY()
-		}
-		_ = v
-	})
-	b.Run("Vec4/XYZ", func(b *testing.B) {
-		a := NewDVec4(1, 2, 3, 4)
-		v := a.XYZ()
-		for b.Loop() {
-			v = a.XYZ()
-		}
-		_ = v
-	})
-
-	b.Run("Mat2/Add", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		c := NewDMat2(5, 6, 7, 8)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Mat2/Sub", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		c := NewDMat2(5, 6, 7, 8)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Mat2/Scale", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Mat2/Transpose", func(b *testing.B) {
-		m := NewDMat2(1, 2, 3, 4)
-		for b.Loop() {
-			m = m.Transpose()
-		}
-		_ = m
-	})
-	b.Run("Mat2/Eq", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		c := NewDMat2(1, 2, 3, 4)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Mat2/ApproxEq", func(b *testing.B) {
-		a := NewDMat2(1, 2, 3, 4)
-		c := NewDMat2(1, 2, 3, 4)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Mat2/Float32", func(b *testing.B) {
-		m := NewDMat2(1, 2, 3, 4)
-		var r Mat2
-		for b.Loop() {
-			r = m.Float32()
-		}
-		_ = r
-	})
-
-	b.Run("Mat3/Add", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Mat3/Sub", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		c := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Mat3/Scale", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Mat3/Transpose", func(b *testing.B) {
-		m := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		for b.Loop() {
-			m = m.Transpose()
-		}
-		_ = m
-	})
-	b.Run("Mat3/Eq", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		c := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Mat3/ApproxEq", func(b *testing.B) {
-		a := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		c := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Mat3/Float32", func(b *testing.B) {
-		m := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
-		var r Mat3
-		for b.Loop() {
-			r = m.Float32()
-		}
-		_ = r
-	})
-
-	b.Run("Mat4/Add", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-		for b.Loop() {
-			a = a.Add(c)
-		}
-		_ = a
-	})
-	b.Run("Mat4/Sub", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		c := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
-		for b.Loop() {
-			a = a.Sub(c)
-		}
-		_ = a
-	})
-	b.Run("Mat4/Scale", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		for b.Loop() {
-			a = a.Scale(2)
-		}
-		_ = a
-	})
-	b.Run("Mat4/Transpose", func(b *testing.B) {
-		m := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		for b.Loop() {
-			m = m.Transpose()
-		}
-		_ = m
-	})
-	b.Run("Mat4/Eq", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		c := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		var r bool
-		for b.Loop() {
-			r = a.Eq(c)
-		}
-		_ = r
-	})
-	b.Run("Mat4/ApproxEq", func(b *testing.B) {
-		a := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		c := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		var r bool
-		for b.Loop() {
-			r = a.ApproxEq(c, 1e-10)
-		}
-		_ = r
-	})
-	b.Run("Mat4/Float32", func(b *testing.B) {
-		m := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		var r Mat4
-		for b.Loop() {
-			r = m.Float32()
-		}
-		_ = r
-	})
-	b.Run("Mat4/Mat3", func(b *testing.B) {
-		m := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-		r := m.Mat3()
-		for b.Loop() {
-			r = m.Mat3()
-		}
-		_ = r
-	})
+	va2 := NewDVec2(1, 2)
+	vb2 := NewDVec2(3, 4)
+	var vd2 float64
+	var vl2 float64
+	var veq2 bool
+	va3 := NewDVec3(1, 2, 3)
+	vb3 := NewDVec3(4, 5, 6)
+	var vd3 float64
+	var vl3 float64
+	var veq3 bool
+	va4 := NewDVec4(1, 2, 3, 4)
+	vb4 := NewDVec4(5, 6, 7, 8)
+	var vd4 float64
+	var vl4 float64
+	var veq4 bool
+	ma2 := NewDMat2(1, 2, 3, 4)
+	mb2 := NewDMat2(5, 6, 7, 8)
+	var meq2 bool
+	ma3 := NewDMat3(1, 2, 3, 4, 5, 6, 7, 8, 9)
+	mb3 := NewDMat3(10, 11, 12, 13, 14, 15, 16, 17, 18)
+	var meq3 bool
+	ma4 := NewDMat4(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+	mb4 := NewDMat4(17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32)
+	var meq4 bool
+	for b.Loop() {
+		va2 = va2.Add(vb2)
+		va2 = va2.Sub(vb2)
+		va2 = va2.Scale(2)
+		vd2 = va2.Dot(vb2)
+		vd2 = va2.LenSq()
+		vl2 = va2.Len()
+		_ = va2.Normalize()
+		_ = va2.Lerp(vb2, 0.5)
+		vl2 = va2.Dist(vb2)
+		veq2 = va2.Eq(vb2)
+		veq2 = va2.ApproxEq(vb2, 1e-10)
+		_ = va2.Float32()
+		va3 = va3.Add(vb3)
+		va3 = va3.Sub(vb3)
+		va3 = va3.Scale(2)
+		vd3 = va3.Dot(vb3)
+		vd3 = va3.LenSq()
+		vl3 = va3.Len()
+		_ = va3.Normalize()
+		_ = va3.Lerp(vb3, 0.5)
+		vl3 = va3.Dist(vb3)
+		veq3 = va3.Eq(vb3)
+		veq3 = va3.ApproxEq(vb3, 1e-10)
+		_ = va3.Float32()
+		va3 = va3.Cross(vb3)
+		_ = va3.XY()
+		va4 = va4.Add(vb4)
+		va4 = va4.Sub(vb4)
+		va4 = va4.Scale(2)
+		vd4 = va4.Dot(vb4)
+		vd4 = va4.LenSq()
+		vl4 = va4.Len()
+		_ = va4.Normalize()
+		_ = va4.Lerp(vb4, 0.5)
+		vl4 = va4.Dist(vb4)
+		veq4 = va4.Eq(vb4)
+		veq4 = va4.ApproxEq(vb4, 1e-10)
+		_ = va4.Float32()
+		_ = va4.XY()
+		_ = va4.XYZ()
+		ma2 = ma2.Add(mb2)
+		ma2 = ma2.Sub(mb2)
+		ma2 = ma2.Scale(2)
+		ma2 = ma2.Transpose()
+		meq2 = ma2.Eq(mb2)
+		meq2 = ma2.ApproxEq(mb2, 1e-10)
+		_ = ma2.Float32()
+		ma3 = ma3.Add(mb3)
+		ma3 = ma3.Sub(mb3)
+		ma3 = ma3.Scale(2)
+		ma3 = ma3.Transpose()
+		meq3 = ma3.Eq(mb3)
+		meq3 = ma3.ApproxEq(mb3, 1e-10)
+		_ = ma3.Float32()
+		ma4 = ma4.Add(mb4)
+		ma4 = ma4.Sub(mb4)
+		ma4 = ma4.Scale(2)
+		ma4 = ma4.Transpose()
+		meq4 = ma4.Eq(mb4)
+		meq4 = ma4.ApproxEq(mb4, 1e-10)
+		_ = ma4.Float32()
+		_ = ma4.Mat3()
+	}
+	_ = va2
+	_ = vd2
+	_ = vl2
+	_ = veq2
+	_ = va3
+	_ = vd3
+	_ = vl3
+	_ = veq3
+	_ = va4
+	_ = vd4
+	_ = vl4
+	_ = veq4
+	_ = ma2
+	_ = meq2
+	_ = ma3
+	_ = meq3
+	_ = ma4
+	_ = meq4
 }

@@ -6,204 +6,114 @@ import "testing"
 
 func Benchmark{{.Name}}Inverse(b *testing.B) {
 {{- range $i := seq 3}}{{$n := add $i 2}}
-	b.Run("Mat{{$n}}", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
-		inv := m.Inverse()
-		for b.Loop() { inv = m.Inverse() }
-		_ = inv
-	})
+	m{{$n}} := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
 {{- end}}
+	for b.Loop() {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+		_ = m{{$n}}.Inverse()
+{{- end}}
+	}
 }
 
 func Benchmark{{.Name}}Mul(b *testing.B) {
 {{- range $i := seq 3}}{{$n := add $i 2}}{{$n2 := mul $n $n}}
-	b.Run("Mat{{$n}}", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-		for b.Loop() { a = a.Mul(c) }
-		_ = a
-	})
-	b.Run("Mat{{$n}}Vec{{$n}}", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		v := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		for b.Loop() { v = m.MulVec{{$n}}(v) }
-		_ = v
-	})
+	m{{$n}} := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+	m{{$n}}b := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
+	v{{$n}} := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+{{- end}}
+	for b.Loop() {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+		m{{$n}} = m{{$n}}.Mul(m{{$n}}b)
+		v{{$n}} = m{{$n}}.MulVec{{$n}}(v{{$n}})
+{{- end}}
+	}
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	_ = m{{$n}}
+	_ = v{{$n}}
 {{- end}}
 }
 
 func Benchmark{{.Name}}Det(b *testing.B) {
 {{- range $i := seq 3}}{{$n := add $i 2}}
-	b.Run("Mat{{$n}}", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
-		var r {{$.ElemType}}
-		for b.Loop() { r = m.Det() }
-		_ = r
-	})
+	m{{$n}} := New{{$.Prefix}}Mat{{$n}}({{invMat $n}})
+	var d{{$n}} {{$.ElemType}}
+{{- end}}
+	for b.Loop() {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+		d{{$n}} = m{{$n}}.Det()
+{{- end}}
+	}
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	_ = d{{$n}}
 {{- end}}
 }
 
 func Benchmark{{.Name}}Ops(b *testing.B) {
 {{- range $i := seq 3}}{{$n := add $i 2}}
-	b.Run("Vec{{$n}}/Add", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-		for b.Loop() { a = a.Add(c) }
-		_ = a
-	})
-	b.Run("Vec{{$n}}/Sub", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-		for b.Loop() { a = a.Sub(c) }
-		_ = a
-	})
-	b.Run("Vec{{$n}}/Scale", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		for b.Loop() { a = a.Scale(2) }
-		_ = a
-	})
-	b.Run("Vec{{$n}}/Dot", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-		var r {{$.ElemType}}
-		for b.Loop() { r = a.Dot(c) }
-		_ = r
-	})
-	b.Run("Vec{{$n}}/LenSq", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		var r {{$.ElemType}}
-		for b.Loop() { r = a.LenSq() }
-		_ = r
-	})
-	b.Run("Vec{{$n}}/Len", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		var r {{$.LenType}}
-		for b.Loop() { r = a.Len() }
-		_ = r
-	})
-	b.Run("Vec{{$n}}/Normalize", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		v := a.Normalize()
-		for b.Loop() { v = a.Normalize() }
-		_ = v
-	})
-	b.Run("Vec{{$n}}/Lerp", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-		v := a.Lerp(c, {{$.LerpT}})
-		for b.Loop() { v = a.Lerp(c, {{$.LerpT}}) }
-		_ = v
-	})
-	b.Run("Vec{{$n}}/Dist", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
-		var r {{$.LenType}}
-		for b.Loop() { r = a.Dist(c) }
-		_ = r
-	})
-	b.Run("Vec{{$n}}/Eq", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		var r bool
-		for b.Loop() { r = a.Eq(c) }
-		_ = r
-	})
+	va{{$n}} := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
+	vb{{$n}} := New{{$.Prefix}}Vec{{$n}}({{intList $n (add $n 1)}})
+	var vd{{$n}} {{$.ElemType}}
+	var vl{{$n}} {{$.LenType}}
+	var veq{{$n}} bool
+{{- end}}
+{{- range $i := seq 3}}{{$n := add $i 2}}{{$n2 := mul $n $n}}
+	ma{{$n}} := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
+	mb{{$n}} := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
+	var meq{{$n}} bool
+{{- end}}
+	for b.Loop() {
+{{- range $i := seq 3}}{{$n := add $i 2}}
+		va{{$n}} = va{{$n}}.Add(vb{{$n}})
+		va{{$n}} = va{{$n}}.Sub(vb{{$n}})
+		va{{$n}} = va{{$n}}.Scale(2)
+		vd{{$n}} = va{{$n}}.Dot(vb{{$n}})
+		vd{{$n}} = va{{$n}}.LenSq()
+		vl{{$n}} = va{{$n}}.Len()
+		_ = va{{$n}}.Normalize()
+		_ = va{{$n}}.Lerp(vb{{$n}}, {{$.LerpT}})
+		vl{{$n}} = va{{$n}}.Dist(vb{{$n}})
+		veq{{$n}} = va{{$n}}.Eq(vb{{$n}})
 {{- if $.HasVecApproxEq}}
-	b.Run("Vec{{$n}}/ApproxEq", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		c := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		var r bool
-		for b.Loop() { r = a.ApproxEq(c, {{$.Epsilon}}) }
-		_ = r
-	})
+		veq{{$n}} = va{{$n}}.ApproxEq(vb{{$n}}, {{$.Epsilon}})
 {{- end}}
 {{- if $.HasFloat32}}
-	b.Run("Vec{{$n}}/Float32", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		var r Vec{{$n}}
-		for b.Loop() { r = a.Float32() }
-		_ = r
-	})
+		_ = va{{$n}}.Float32()
 {{- end}}
 {{- if eq $n 3}}
-	b.Run("Vec3/Cross", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec3({{intList 3 1}})
-		c := New{{$.Prefix}}Vec3({{intList 3 4}})
-		for b.Loop() { a = a.Cross(c) }
-		_ = a
-	})
+		va3 = va3.Cross(vb3)
 {{- end}}
 {{- if ge $n 3}}
-	b.Run("Vec{{$n}}/XY", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec{{$n}}({{intList $n 1}})
-		v := a.XY()
-		for b.Loop() { v = a.XY() }
-		_ = v
-	})
+		_ = va{{$n}}.XY()
 {{- end}}
 {{- if eq $n 4}}
-	b.Run("Vec4/XYZ", func(b *testing.B) {
-		a := New{{$.Prefix}}Vec4({{intList 4 1}})
-		v := a.XYZ()
-		for b.Loop() { v = a.XYZ() }
-		_ = v
-	})
+		_ = va4.XYZ()
 {{- end}}
-{{end}}
-{{- range $i := seq 3}}{{$n := add $i 2}}{{$n2 := mul $n $n}}
-	b.Run("Mat{{$n}}/Add", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-		for b.Loop() { a = a.Add(c) }
-		_ = a
-	})
-	b.Run("Mat{{$n}}/Sub", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 (add $n2 1)}})
-		for b.Loop() { a = a.Sub(c) }
-		_ = a
-	})
-	b.Run("Mat{{$n}}/Scale", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		for b.Loop() { a = a.Scale(2) }
-		_ = a
-	})
-	b.Run("Mat{{$n}}/Transpose", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		for b.Loop() { m = m.Transpose() }
-		_ = m
-	})
-	b.Run("Mat{{$n}}/Eq", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		var r bool
-		for b.Loop() { r = a.Eq(c) }
-		_ = r
-	})
+{{- end}}
+{{- range $i := seq 3}}{{$n := add $i 2}}
+		ma{{$n}} = ma{{$n}}.Add(mb{{$n}})
+		ma{{$n}} = ma{{$n}}.Sub(mb{{$n}})
+		ma{{$n}} = ma{{$n}}.Scale(2)
+		ma{{$n}} = ma{{$n}}.Transpose()
+		meq{{$n}} = ma{{$n}}.Eq(mb{{$n}})
 {{- if $.HasMatApproxEq}}
-	b.Run("Mat{{$n}}/ApproxEq", func(b *testing.B) {
-		a := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		c := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		var r bool
-		for b.Loop() { r = a.ApproxEq(c, {{$.Epsilon}}) }
-		_ = r
-	})
+		meq{{$n}} = ma{{$n}}.ApproxEq(mb{{$n}}, {{$.Epsilon}})
 {{- end}}
 {{- if $.HasFloat32}}
-	b.Run("Mat{{$n}}/Float32", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat{{$n}}({{intList $n2 1}})
-		var r Mat{{$n}}
-		for b.Loop() { r = m.Float32() }
-		_ = r
-	})
+		_ = ma{{$n}}.Float32()
 {{- end}}
 {{- if and (eq $n 4) $.HasMat3}}
-	b.Run("Mat4/Mat3", func(b *testing.B) {
-		m := New{{$.Prefix}}Mat4({{intList 16 1}})
-		r := m.Mat3()
-		for b.Loop() { r = m.Mat3() }
-		_ = r
-	})
+		_ = ma4.Mat3()
 {{- end}}
-{{end -}}
+{{- end}}
+	}
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	_ = va{{$n}}
+	_ = vd{{$n}}
+	_ = vl{{$n}}
+	_ = veq{{$n}}
+{{- end}}
+{{- range $i := seq 3}}{{$n := add $i 2}}
+	_ = ma{{$n}}
+	_ = meq{{$n}}
+{{- end}}
 }
