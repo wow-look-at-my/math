@@ -115,6 +115,33 @@ func main() {
 		}
 	}
 
+	// Generate float64 (double) concrete types.
+	dvecTmpl := template.Must(
+		template.New("dvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dvec.go.tmpl")),
+	)
+	dmatTmpl := template.Must(
+		template.New("dmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dmat.go.tmpl")),
+	)
+	dtestTmpl := template.Must(
+		template.New("dtest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dtest.go.tmpl")),
+	)
+
+	for _, n := range []int{2, 3, 4} {
+		if err := generateFile(dvecTmpl, fmt.Sprintf("dvec%d.go", n), vecData{N: n}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := generateFile(dmatTmpl, fmt.Sprintf("dmat%d.go", n), matData{N: n, N2: n * n}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if err := generateFile(dtestTmpl, "d_test.go", nil); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Generate integer concrete types.
 	intTypes := []struct {
 		Prefix string
