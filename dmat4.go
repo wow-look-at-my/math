@@ -147,6 +147,7 @@ func (m DMat4) Mat3() DMat3 {
 		m.Data[8], m.Data[9], m.Data[10],
 	}}
 }
+
 func (a DMat4) Eq(b DMat4) bool {
 	for i := range a.Data {
 		if a.Data[i] != b.Data[i] {

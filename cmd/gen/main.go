@@ -116,28 +116,40 @@ func main() {
 	}
 
 	// Generate float64 (double) concrete types.
-	dvecTmpl := template.Must(
-		template.New("dvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dvec.go.tmpl")),
+	fvecTmpl := template.Must(
+		template.New("fvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fvec.go.tmpl")),
 	)
-	dmatTmpl := template.Must(
-		template.New("dmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dmat.go.tmpl")),
+	fmatTmpl := template.Must(
+		template.New("fmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fmat.go.tmpl")),
 	)
-	dtestTmpl := template.Must(
-		template.New("dtest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "dtest.go.tmpl")),
+	ftestTmpl := template.Must(
+		template.New("ftest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ftest.go.tmpl")),
 	)
 
 	for _, n := range []int{2, 3, 4} {
-		if err := generateFile(dvecTmpl, fmt.Sprintf("dvec%d.go", n), vecData{N: n}); err != nil {
+		if err := generateFile(fvecTmpl, fmt.Sprintf("dvec%d.go", n), ivecData{
+			N:        n,
+			Prefix:   "D",
+			ElemType: "float64",
+		}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
-		if err := generateFile(dmatTmpl, fmt.Sprintf("dmat%d.go", n), matData{N: n, N2: n * n}); err != nil {
+		if err := generateFile(fmatTmpl, fmt.Sprintf("dmat%d.go", n), imatData{
+			N:        n,
+			N2:       n * n,
+			Prefix:   "D",
+			ElemType: "float64",
+		}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
 		}
 	}
 
-	if err := generateFile(dtestTmpl, "d_test.go", nil); err != nil {
+	if err := generateFile(ftestTmpl, "d_test.go", itestData{
+		Prefix:   "D",
+		ElemType: "float64",
+	}); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
