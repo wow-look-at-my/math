@@ -55,6 +55,17 @@ type itestData struct {
 	Signed   bool
 }
 
+type benchData struct {
+	Prefix     string
+	ElemType   string
+	LenType    string
+	LerpT      string
+	HasApproxEq bool
+	HasFloat32  bool
+	HasMat3     bool
+	Epsilon    string
+}
+
 // genDir returns the directory containing this source file,
 // which is where the .tmpl files live.
 func genDir() string {
@@ -198,6 +209,44 @@ func main() {
 			Prefix:   it.Prefix,
 			ElemType: it.GoType,
 			Signed:   it.Signed,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	// Generate benchmark files.
+	benchTmpl := template.Must(
+		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
+	)
+
+	// Float64 benchmarks.
+	if err := generateFile(benchTmpl, "d_bench_test.go", benchData{
+		Prefix:      "D",
+		ElemType:    "float64",
+		LenType:     "float64",
+		LerpT:       "0.5",
+		HasApproxEq: true,
+		HasFloat32:  true,
+		HasMat3:     true,
+		Epsilon:     "1e-10",
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Integer type benchmarks.
+	for _, it := range intTypes {
+		prefix := strings.ToLower(it.Prefix)
+		if err := generateFile(benchTmpl, fmt.Sprintf("%s_bench_test.go", prefix), benchData{
+			Prefix:      it.Prefix,
+			ElemType:    it.GoType,
+			LenType:     "float32",
+			LerpT:       "0.5",
+			HasApproxEq: false,
+			HasFloat32:  true,
+			HasMat3:     false,
+			Epsilon:     "",
 		}); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 			os.Exit(1)
