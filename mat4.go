@@ -1,0 +1,246 @@
+package math
+
+// TMat4 is a 4x4 matrix in column-major order.
+type TMat4[T Float] [16]T
+
+// Mat4 is a TMat4 of float32.
+type Mat4 = TMat4[float32]
+
+// NewTMat4 creates a 4x4 matrix from row-major arguments.
+func NewTMat4[T Float](
+	m00, m01, m02, m03 T,
+	m10, m11, m12, m13 T,
+	m20, m21, m22, m23 T,
+	m30, m31, m32, m33 T,
+) TMat4[T] {
+	return TMat4[T]{
+		m00, m10, m20, m30, // col 0
+		m01, m11, m21, m31, // col 1
+		m02, m12, m22, m32, // col 2
+		m03, m13, m23, m33, // col 3
+	}
+}
+
+func NewMat4(
+	m00, m01, m02, m03 float32,
+	m10, m11, m12, m13 float32,
+	m20, m21, m22, m23 float32,
+	m30, m31, m32, m33 float32,
+) Mat4 {
+	return NewTMat4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33)
+}
+
+func Mat4Identity() Mat4 {
+	return NewMat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+}
+
+func (m TMat4[T]) Col(c int) TVec4[T] {
+	i := c * 4
+	return TVec4[T]{m[i], m[i+1], m[i+2], m[i+3]}
+}
+
+func (m TMat4[T]) Row(r int) TVec4[T] {
+	return TVec4[T]{m[r], m[r+4], m[r+8], m[r+12]}
+}
+
+func (m TMat4[T]) At(row, col int) T {
+	return m[col*4+row]
+}
+
+func (a TMat4[T]) Add(b TMat4[T]) TMat4[T] {
+	var out TMat4[T]
+	for i := range out {
+		out[i] = a[i] + b[i]
+	}
+	return out
+}
+
+func (a TMat4[T]) Sub(b TMat4[T]) TMat4[T] {
+	var out TMat4[T]
+	for i := range out {
+		out[i] = a[i] - b[i]
+	}
+	return out
+}
+
+func (m TMat4[T]) Scale(s T) TMat4[T] {
+	var out TMat4[T]
+	for i := range out {
+		out[i] = m[i] * s
+	}
+	return out
+}
+
+func (a TMat4[T]) Mul(b TMat4[T]) TMat4[T] {
+	var out TMat4[T]
+	for c := 0; c < 4; c++ {
+		bc := b.Col(c)
+		for r := 0; r < 4; r++ {
+			out[c*4+r] = a.Row(r).Dot(bc)
+		}
+	}
+	return out
+}
+
+func (m TMat4[T]) MulVec4(v TVec4[T]) TVec4[T] {
+	return TVec4[T]{
+		m.Row(0).Dot(v),
+		m.Row(1).Dot(v),
+		m.Row(2).Dot(v),
+		m.Row(3).Dot(v),
+	}
+}
+
+func (m TMat4[T]) Transpose() TMat4[T] {
+	return NewTMat4(
+		m.At(0, 0), m.At(1, 0), m.At(2, 0), m.At(3, 0),
+		m.At(0, 1), m.At(1, 1), m.At(2, 1), m.At(3, 1),
+		m.At(0, 2), m.At(1, 2), m.At(2, 2), m.At(3, 2),
+		m.At(0, 3), m.At(1, 3), m.At(2, 3), m.At(3, 3),
+	)
+}
+
+func (m TMat4[T]) Det() T {
+	a, b, c, d := m.At(0, 0), m.At(0, 1), m.At(0, 2), m.At(0, 3)
+	return a*m.cofactor(0, 0) - b*m.cofactor(0, 1) + c*m.cofactor(0, 2) - d*m.cofactor(0, 3)
+}
+
+func (m TMat4[T]) cofactor(row, col int) T {
+	var sub [9]T
+	idx := 0
+	for c := 0; c < 4; c++ {
+		if c == col {
+			continue
+		}
+		for r := 0; r < 4; r++ {
+			if r == row {
+				continue
+			}
+			sub[idx] = m.At(r, c)
+			idx++
+		}
+	}
+	return sub[0]*(sub[4]*sub[8]-sub[5]*sub[7]) -
+		sub[3]*(sub[1]*sub[8]-sub[2]*sub[7]) +
+		sub[6]*(sub[1]*sub[5]-sub[2]*sub[4])
+}
+
+func (m TMat4[T]) Inverse() TMat4[T] {
+	d := m.Det()
+	if d == 0 {
+		return TMat4[T]{}
+	}
+	invD := 1.0 / d
+
+	var out TMat4[T]
+	for c := 0; c < 4; c++ {
+		for r := 0; r < 4; r++ {
+			sign := T(1)
+			if (r+c)%2 != 0 {
+				sign = -1
+			}
+			out[c*4+r] = sign * m.cofactor(c, r) * invD
+		}
+	}
+	return out
+}
+
+func (m TMat4[T]) Mat3() TMat3[T] {
+	return TMat3[T]{
+		m[0], m[1], m[2],
+		m[4], m[5], m[6],
+		m[8], m[9], m[10],
+	}
+}
+
+// Translation creates a translation matrix.
+func Translation(v Vec3) Mat4 {
+	return NewMat4(
+		1, 0, 0, v[0],
+		0, 1, 0, v[1],
+		0, 0, 1, v[2],
+		0, 0, 0, 1,
+	)
+}
+
+// Scaling creates a scale matrix.
+func Scaling(v Vec3) Mat4 {
+	return NewMat4(
+		v[0], 0, 0, 0,
+		0, v[1], 0, 0,
+		0, 0, v[2], 0,
+		0, 0, 0, 1,
+	)
+}
+
+// RotationX creates a rotation matrix around the X axis. Angle in radians.
+func RotationX(angle float32) Mat4 {
+	c := cos(angle)
+	s := sin(angle)
+	return NewMat4(
+		1, 0, 0, 0,
+		0, c, -s, 0,
+		0, s, c, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// RotationY creates a rotation matrix around the Y axis. Angle in radians.
+func RotationY(angle float32) Mat4 {
+	c := cos(angle)
+	s := sin(angle)
+	return NewMat4(
+		c, 0, s, 0,
+		0, 1, 0, 0,
+		-s, 0, c, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// RotationZ creates a rotation matrix around the Z axis. Angle in radians.
+func RotationZ(angle float32) Mat4 {
+	c := cos(angle)
+	s := sin(angle)
+	return NewMat4(
+		c, -s, 0, 0,
+		s, c, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	)
+}
+
+// LookAt creates a view matrix looking from eye toward center with the given up vector.
+func LookAt(eye, center, up Vec3) Mat4 {
+	f := center.Sub(eye).Normalize()
+	s := f.Cross(up).Normalize()
+	u := s.Cross(f)
+
+	return NewMat4(
+		s[0], s[1], s[2], -s.Dot(eye),
+		u[0], u[1], u[2], -u.Dot(eye),
+		-f[0], -f[1], -f[2], f.Dot(eye),
+		0, 0, 0, 1,
+	)
+}
+
+// Perspective creates a perspective projection matrix.
+// fovY is vertical field of view in radians.
+func Perspective(fovY, aspect, near, far float32) Mat4 {
+	t := tan(fovY / 2.0)
+	return NewMat4(
+		1.0/(aspect*t), 0, 0, 0,
+		0, 1.0/t, 0, 0,
+		0, 0, -(far+near)/(far-near), -(2.0*far*near)/(far-near),
+		0, 0, -1, 0,
+	)
+}
+
+// Ortho creates an orthographic projection matrix.
+func Ortho(left, right, bottom, top, near, far float32) Mat4 {
+	return NewMat4(
+		2.0/(right-left), 0, 0, -(right+left)/(right-left),
+		0, 2.0/(top-bottom), 0, -(top+bottom)/(top-bottom),
+		0, 0, -2.0/(far-near), -(far+near)/(far-near),
+		0, 0, 0, 1,
+	)
+}

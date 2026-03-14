@@ -1,0 +1,102 @@
+package math
+
+// TMat2 is a 2x2 matrix in column-major order.
+type TMat2[T Float] [4]T
+
+// Mat2 is a TMat2 of float32.
+type Mat2 = TMat2[float32]
+
+// NewTMat2 creates a 2x2 matrix from row-major arguments.
+func NewTMat2[T Float](
+	m00, m01 T,
+	m10, m11 T,
+) TMat2[T] {
+	return TMat2[T]{
+		m00, m10, // col 0
+		m01, m11, // col 1
+	}
+}
+
+func NewMat2(
+	m00, m01 float32,
+	m10, m11 float32,
+) Mat2 {
+	return NewTMat2(m00, m01, m10, m11)
+}
+
+func Mat2Identity() Mat2 {
+	return NewMat2(1, 0, 0, 1)
+}
+
+func (m TMat2[T]) Col(c int) TVec2[T] {
+	return TVec2[T]{m[c*2], m[c*2+1]}
+}
+
+func (m TMat2[T]) Row(r int) TVec2[T] {
+	return TVec2[T]{m[r], m[r+2]}
+}
+
+func (m TMat2[T]) At(row, col int) T {
+	return m[col*2+row]
+}
+
+func (a TMat2[T]) Add(b TMat2[T]) TMat2[T] {
+	var out TMat2[T]
+	for i := range out {
+		out[i] = a[i] + b[i]
+	}
+	return out
+}
+
+func (a TMat2[T]) Sub(b TMat2[T]) TMat2[T] {
+	var out TMat2[T]
+	for i := range out {
+		out[i] = a[i] - b[i]
+	}
+	return out
+}
+
+func (m TMat2[T]) Scale(s T) TMat2[T] {
+	var out TMat2[T]
+	for i := range out {
+		out[i] = m[i] * s
+	}
+	return out
+}
+
+func (a TMat2[T]) Mul(b TMat2[T]) TMat2[T] {
+	return NewTMat2(
+		a.Row(0).Dot(b.Col(0)), a.Row(0).Dot(b.Col(1)),
+		a.Row(1).Dot(b.Col(0)), a.Row(1).Dot(b.Col(1)),
+	)
+}
+
+func (m TMat2[T]) MulVec2(v TVec2[T]) TVec2[T] {
+	return TVec2[T]{
+		m.Row(0).Dot(v),
+		m.Row(1).Dot(v),
+	}
+}
+
+func (m TMat2[T]) Transpose() TMat2[T] {
+	return NewTMat2(
+		m.At(0, 0), m.At(1, 0),
+		m.At(0, 1), m.At(1, 1),
+	)
+}
+
+func (m TMat2[T]) Det() T {
+	return m[0]*m[3] - m[2]*m[1]
+}
+
+func (m TMat2[T]) Inverse() TMat2[T] {
+	d := m.Det()
+	if d == 0 {
+		return TMat2[T]{}
+	}
+	invD := 1.0 / d
+	return TMat2[T]{
+		m[3] * invD, -m[1] * invD,
+		-m[2] * invD, m[0] * invD,
+	}
+}
