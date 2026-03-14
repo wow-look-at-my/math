@@ -1,4 +1,4 @@
-module github.com/math
+module github.com/wow-look-at-my/math
 
 go 1.24.7
 
