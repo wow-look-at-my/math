@@ -115,6 +115,45 @@ func main() {
 		}
 	}
 
+	// Generate float64 (double) concrete types.
+	fvecTmpl := template.Must(
+		template.New("fvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fvec.go.tmpl")),
+	)
+	fmatTmpl := template.Must(
+		template.New("fmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fmat.go.tmpl")),
+	)
+	ftestTmpl := template.Must(
+		template.New("ftest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ftest.go.tmpl")),
+	)
+
+	for _, n := range []int{2, 3, 4} {
+		if err := generateFile(fvecTmpl, fmt.Sprintf("dvec%d.go", n), ivecData{
+			N:        n,
+			Prefix:   "D",
+			ElemType: "float64",
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		if err := generateFile(fmatTmpl, fmt.Sprintf("dmat%d.go", n), imatData{
+			N:        n,
+			N2:       n * n,
+			Prefix:   "D",
+			ElemType: "float64",
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if err := generateFile(ftestTmpl, "d_test.go", itestData{
+		Prefix:   "D",
+		ElemType: "float64",
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Generate integer concrete types.
 	intTypes := []struct {
 		Prefix string
