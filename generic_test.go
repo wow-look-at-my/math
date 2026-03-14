@@ -151,3 +151,9 @@ func TestTMat4IntDet(t *testing.T) {
 	m := NewTMat4[int](1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4)
 	assert.Equal(t, 24, m.Det())
 }
+
+func TestUtilClamp(t *testing.T) {
+	assert.Equal(t, float32(5), Clamp[float32](5, 0, 10))
+	assert.Equal(t, float32(0), Clamp[float32](-1, 0, 10))
+	assert.Equal(t, float32(10), Clamp[float32](15, 0, 10))
+}

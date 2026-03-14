@@ -3,6 +3,7 @@
 package math
 
 import (
+	stdmath "math"
 	"testing"
 
 	"github.com/wow-look-at-my/testify/assert"
@@ -66,6 +67,13 @@ func TestDVec2Lerp(t *testing.T) {
 func TestDVec2Eq(t *testing.T) {
 	assert.True(t, DVec2{X: 1, Y: 2}.Eq(DVec2{X: 1, Y: 2}))
 	assert.False(t, DVec2{X: 1, Y: 2}.Eq(DVec2{X: 1, Y: 3}))
+}
+
+func TestDVec2ApproxEq(t *testing.T) {
+	a := NewDVec2(1.0, 2.0)
+	b := NewDVec2(1.0001, 2.0001)
+	assert.True(t, a.ApproxEq(b, 0.001))
+	assert.False(t, a.ApproxEq(b, 0.00001))
 }
 
 func TestDVec2Float32(t *testing.T) {
@@ -544,3 +552,73 @@ func TestDMat4Eq(t *testing.T) {
 func TestDMat4Float32(t *testing.T) {
 	assert.Equal(t, Mat4Identity(), DMat4Identity().Float32())
 }
+
+// ---------------------------------------------------------------------------
+// D Graphics helpers
+// ---------------------------------------------------------------------------
+
+func TestDTranslation(t *testing.T) {
+	m := DTranslation(NewDVec3(2, 3, 4))
+	v := NewDVec4(1, 1, 1, 1)
+	got := m.MulVec4(v)
+	want := NewDVec4(3, 4, 5, 1)
+	assert.True(t, got.Eq(want))
+}
+
+func TestDScaling(t *testing.T) {
+	m := DScaling(NewDVec3(2, 3, 4))
+	v := NewDVec4(1, 1, 1, 1)
+	got := m.MulVec4(v)
+	want := NewDVec4(2, 3, 4, 1)
+	assert.True(t, got.Eq(want))
+}
+
+func TestDRotationX(t *testing.T) {
+	m := DRotationX(float64(stdmath.Pi / 2))
+	v := NewDVec4(0, 1, 0, 1)
+	got := m.MulVec4(v)
+	want := NewDVec4(0, 0, 1, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func TestDRotationY(t *testing.T) {
+	m := DRotationY(float64(stdmath.Pi / 2))
+	v := NewDVec4(1, 0, 0, 1)
+	got := m.MulVec4(v)
+	want := NewDVec4(0, 0, -1, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func TestDRotationZ(t *testing.T) {
+	m := DRotationZ(float64(stdmath.Pi / 2))
+	v := NewDVec4(1, 0, 0, 1)
+	got := m.MulVec4(v)
+	want := NewDVec4(0, 1, 0, 1)
+	assert.True(t, got.ApproxEq(want, 1e-5))
+}
+
+func TestDLookAt(t *testing.T) {
+	eye := NewDVec3(0, 0, 5)
+	center := NewDVec3(0, 0, 0)
+	up := NewDVec3(0, 1, 0)
+	m := DLookAt(eye, center, up)
+	v := m.MulVec4(NewDVec4(0, 0, 0, 1))
+	assert.True(t, v.ApproxEq(NewDVec4(0, 0, -5, 1), 1e-5))
+}
+
+func TestDPerspective(t *testing.T) {
+	m := DPerspective(float64(stdmath.Pi/4), 1.0, 0.1, 100.0)
+	v := m.MulVec4(NewDVec4(0, 0, -0.1, 1))
+	ndc := v.Scale(1.0 / v.W)
+	assert.False(t, ndc.Z < -1.01 || ndc.Z > -0.99)
+}
+
+func TestDOrtho(t *testing.T) {
+	m := DOrtho(-1, 1, -1, 1, -1, 1)
+	v := m.MulVec4(NewDVec4(0, 0, 0, 1))
+	want := NewDVec4(0, 0, 0, 1)
+	assert.True(t, v.ApproxEq(want, 1e-5))
+}
+
+// ensure stdmath import is used
+var _ = stdmath.Pi

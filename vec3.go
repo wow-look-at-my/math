@@ -2,8 +2,6 @@
 
 package math
 
-import "math"
-
 // TVec3 is a generic 3-component vector.
 type TVec3[T Numeric] struct {
 	X T
@@ -57,87 +55,4 @@ func (a TVec3[T]) Eq(b TVec3[T]) bool {
 
 func (v TVec3[T]) XY() TVec2[T] {
 	return TVec2[T]{X: v.X, Y: v.Y}
-}
-
-// Vec3 is a 3-component float32 vector.
-type Vec3 struct {
-	X float32
-	Y float32
-	Z float32
-}
-
-func NewVec3(x float32, y float32, z float32) Vec3 {
-	return Vec3{X: x, Y: y, Z: z}
-}
-
-func (a Vec3) Add(b Vec3) Vec3 {
-	return Vec3{
-		X: a.X + b.X,
-		Y: a.Y + b.Y,
-		Z: a.Z + b.Z,
-	}
-}
-
-func (a Vec3) Sub(b Vec3) Vec3 {
-	return Vec3{
-		X: a.X - b.X,
-		Y: a.Y - b.Y,
-		Z: a.Z - b.Z,
-	}
-}
-
-func (v Vec3) Scale(s float32) Vec3 {
-	return Vec3{
-		X: v.X * s,
-		Y: v.Y * s,
-		Z: v.Z * s,
-	}
-}
-
-func (a Vec3) Dot(b Vec3) float32 {
-	return a.X*b.X + a.Y*b.Y + a.Z*b.Z
-}
-
-func (a Vec3) Cross(b Vec3) Vec3 {
-	return Vec3{
-		X: a.Y*b.Z - a.Z*b.Y,
-		Y: a.Z*b.X - a.X*b.Z,
-		Z: a.X*b.Y - a.Y*b.X,
-	}
-}
-
-func (v Vec3) Len() float32 {
-	return float32(math.Sqrt(float64(v.Dot(v))))
-}
-
-func (v Vec3) LenSq() float32 {
-	return v.Dot(v)
-}
-
-func (v Vec3) Normalize() Vec3 {
-	l := v.Len()
-	if l == 0 {
-		return Vec3{}
-	}
-	return v.Scale(1.0 / l)
-}
-
-func (a Vec3) Lerp(b Vec3, t float32) Vec3 {
-	return a.Add(b.Sub(a).Scale(t))
-}
-
-func (a Vec3) Dist(b Vec3) float32 {
-	return a.Sub(b).Len()
-}
-
-func (a Vec3) Eq(b Vec3) bool {
-	return a.X == b.X && a.Y == b.Y && a.Z == b.Z
-}
-
-func (a Vec3) ApproxEq(b Vec3, eps float32) bool {
-	return abs(a.X-b.X) <= eps && abs(a.Y-b.Y) <= eps && abs(a.Z-b.Z) <= eps
-}
-
-func (v Vec3) XY() Vec2 {
-	return Vec2{X: v.X, Y: v.Y}
 }
