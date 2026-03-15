@@ -14,5 +14,4 @@ jobs:
 
       - uses: wow-look-at-my/go-toolchain@latest
         with:
-          go-version-file: ./go.mod
           generate: 8a4f77935fb5
