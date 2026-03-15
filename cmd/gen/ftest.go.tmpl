@@ -813,5 +813,83 @@ func Test{{.Prefix}}QuatFloat32(t *testing.T) {
 }
 {{end -}}
 
+// ---------------------------------------------------------------------------
+// {{.Prefix}}EulerAngles
+// ---------------------------------------------------------------------------
+
+func Test{{.Prefix}}EulerAnglesConstructor(t *testing.T) {
+	e := New{{.Prefix}}EulerAngles(1, 2, 3)
+	assert.Equal(t, {{.ElemType}}(1), e.Pitch)
+	assert.Equal(t, {{.ElemType}}(2), e.Yaw)
+	assert.Equal(t, {{.ElemType}}(3), e.Roll)
+}
+
+func Test{{.Prefix}}EulerAnglesToQuatIdentity(t *testing.T) {
+	e := New{{.Prefix}}EulerAngles(0, 0, 0)
+	assert.True(t, e.ToQuat().ApproxEq({{.Prefix}}QuatIdentity(), 1e-6))
+}
+
+func Test{{.Prefix}}EulerAnglesToQuatPitchOnly(t *testing.T) {
+	angle := {{.ElemType}}(stdmath.Pi / 4)
+	e := New{{.Prefix}}EulerAngles(angle, 0, 0)
+	want := {{.Prefix}}QuatFromAxisAngle(New{{.Prefix}}Vec3(1, 0, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}EulerAnglesToQuatYawOnly(t *testing.T) {
+	angle := {{.ElemType}}(stdmath.Pi / 3)
+	e := New{{.Prefix}}EulerAngles(0, angle, 0)
+	want := {{.Prefix}}QuatFromAxisAngle(New{{.Prefix}}Vec3(0, 1, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}EulerAnglesToQuatRollOnly(t *testing.T) {
+	angle := {{.ElemType}}(stdmath.Pi / 6)
+	e := New{{.Prefix}}EulerAngles(0, 0, angle)
+	want := {{.Prefix}}QuatFromAxisAngle(New{{.Prefix}}Vec3(0, 0, 1), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func Test{{.Prefix}}EulerAnglesRoundTrip(t *testing.T) {
+	e := New{{.Prefix}}EulerAngles(0.3, 0.5, 0.7)
+	got := {{.Prefix}}EulerAnglesFromQuat(e.ToQuat())
+	assert.True(t, got.ApproxEq(e, 1e-5))
+}
+
+func Test{{.Prefix}}EulerAnglesFromQuatIdentity(t *testing.T) {
+	got := {{.Prefix}}EulerAnglesFromQuat({{.Prefix}}QuatIdentity())
+	assert.True(t, got.ApproxEq(New{{.Prefix}}EulerAngles(0, 0, 0), 1e-6))
+}
+
+func Test{{.Prefix}}EulerAnglesEq(t *testing.T) {
+	a := New{{.Prefix}}EulerAngles(1, 2, 3)
+	assert.True(t, a.Eq(New{{.Prefix}}EulerAngles(1, 2, 3)))
+	assert.False(t, a.Eq(New{{.Prefix}}EulerAngles(1, 2, 4)))
+}
+
+func Test{{.Prefix}}EulerAnglesApproxEq(t *testing.T) {
+	a := New{{.Prefix}}EulerAngles(1.0, 2.0, 3.0)
+	b := New{{.Prefix}}EulerAngles(1.0001, 2.0001, 3.0001)
+	assert.True(t, a.ApproxEq(b, 0.001))
+	assert.False(t, a.ApproxEq(b, 0.00001))
+}
+
+func Test{{.Prefix}}EulerAnglesJSON(t *testing.T) {
+	e := New{{.Prefix}}EulerAngles(1, 2, 3)
+	data, err := e.MarshalJSON()
+	assert.Equal(t, nil, err)
+	var e2 {{.Prefix}}EulerAngles
+	err = e2.UnmarshalJSON(data)
+	assert.Equal(t, nil, err)
+	assert.True(t, e.Eq(e2))
+}
+
+{{if ne .Prefix "" -}}
+func Test{{.Prefix}}EulerAnglesFloat32(t *testing.T) {
+	got := New{{.Prefix}}EulerAngles(1, 2, 3).Float32()
+	assert.True(t, got.Eq(NewEulerAngles(1, 2, 3)))
+}
+{{end -}}
+
 // ensure stdmath import is used
 var _ = stdmath.Pi

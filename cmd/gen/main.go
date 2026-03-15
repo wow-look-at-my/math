@@ -154,6 +154,7 @@ func run(outDir string) error {
 	fmatTmpl := parseTmpl("fmat.go.tmpl")
 	ftestTmpl := parseTmpl("ftest.go.tmpl")
 	fquatTmpl := parseTmpl("fquat.go.tmpl")
+	feulerTmpl := parseTmpl("feuler.go.tmpl")
 
 	floatTypes := []struct {
 		Prefix     string
@@ -185,6 +186,14 @@ func run(outDir string) error {
 
 		if err := generateFile(fquatTmpl, outPath(fmt.Sprintf("%squat.go", ft.FilePrefix)), ivecData{
 			N:        4,
+			Prefix:   ft.Prefix,
+			ElemType: ft.ElemType,
+		}); err != nil {
+			return err
+		}
+
+		if err := generateFile(feulerTmpl, outPath(fmt.Sprintf("%seuler.go", ft.FilePrefix)), ivecData{
+			N:        3,
 			Prefix:   ft.Prefix,
 			ElemType: ft.ElemType,
 		}); err != nil {

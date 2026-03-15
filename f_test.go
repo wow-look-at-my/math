@@ -768,5 +768,76 @@ func TestQuatJSON(t *testing.T) {
 	assert.True(t, q.Eq(q2))
 }
 
+// ---------------------------------------------------------------------------
+// EulerAngles
+// ---------------------------------------------------------------------------
+
+func TestEulerAnglesConstructor(t *testing.T) {
+	e := NewEulerAngles(1, 2, 3)
+	assert.Equal(t, float32(1), e.Pitch)
+	assert.Equal(t, float32(2), e.Yaw)
+	assert.Equal(t, float32(3), e.Roll)
+}
+
+func TestEulerAnglesToQuatIdentity(t *testing.T) {
+	e := NewEulerAngles(0, 0, 0)
+	assert.True(t, e.ToQuat().ApproxEq(QuatIdentity(), 1e-6))
+}
+
+func TestEulerAnglesToQuatPitchOnly(t *testing.T) {
+	angle := float32(stdmath.Pi / 4)
+	e := NewEulerAngles(angle, 0, 0)
+	want := QuatFromAxisAngle(NewVec3(1, 0, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestEulerAnglesToQuatYawOnly(t *testing.T) {
+	angle := float32(stdmath.Pi / 3)
+	e := NewEulerAngles(0, angle, 0)
+	want := QuatFromAxisAngle(NewVec3(0, 1, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestEulerAnglesToQuatRollOnly(t *testing.T) {
+	angle := float32(stdmath.Pi / 6)
+	e := NewEulerAngles(0, 0, angle)
+	want := QuatFromAxisAngle(NewVec3(0, 0, 1), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestEulerAnglesRoundTrip(t *testing.T) {
+	e := NewEulerAngles(0.3, 0.5, 0.7)
+	got := EulerAnglesFromQuat(e.ToQuat())
+	assert.True(t, got.ApproxEq(e, 1e-5))
+}
+
+func TestEulerAnglesFromQuatIdentity(t *testing.T) {
+	got := EulerAnglesFromQuat(QuatIdentity())
+	assert.True(t, got.ApproxEq(NewEulerAngles(0, 0, 0), 1e-6))
+}
+
+func TestEulerAnglesEq(t *testing.T) {
+	a := NewEulerAngles(1, 2, 3)
+	assert.True(t, a.Eq(NewEulerAngles(1, 2, 3)))
+	assert.False(t, a.Eq(NewEulerAngles(1, 2, 4)))
+}
+
+func TestEulerAnglesApproxEq(t *testing.T) {
+	a := NewEulerAngles(1.0, 2.0, 3.0)
+	b := NewEulerAngles(1.0001, 2.0001, 3.0001)
+	assert.True(t, a.ApproxEq(b, 0.001))
+	assert.False(t, a.ApproxEq(b, 0.00001))
+}
+
+func TestEulerAnglesJSON(t *testing.T) {
+	e := NewEulerAngles(1, 2, 3)
+	data, err := e.MarshalJSON()
+	assert.Equal(t, nil, err)
+	var e2 EulerAngles
+	err = e2.UnmarshalJSON(data)
+	assert.Equal(t, nil, err)
+	assert.True(t, e.Eq(e2))
+}
+
 // ensure stdmath import is used
 var _ = stdmath.Pi

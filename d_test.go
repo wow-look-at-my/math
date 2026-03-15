@@ -797,5 +797,81 @@ func TestDQuatFloat32(t *testing.T) {
 	assert.True(t, got.Eq(NewQuat(1, 2, 3, 4)))
 }
 
+// ---------------------------------------------------------------------------
+// DEulerAngles
+// ---------------------------------------------------------------------------
+
+func TestDEulerAnglesConstructor(t *testing.T) {
+	e := NewDEulerAngles(1, 2, 3)
+	assert.Equal(t, float64(1), e.Pitch)
+	assert.Equal(t, float64(2), e.Yaw)
+	assert.Equal(t, float64(3), e.Roll)
+}
+
+func TestDEulerAnglesToQuatIdentity(t *testing.T) {
+	e := NewDEulerAngles(0, 0, 0)
+	assert.True(t, e.ToQuat().ApproxEq(DQuatIdentity(), 1e-6))
+}
+
+func TestDEulerAnglesToQuatPitchOnly(t *testing.T) {
+	angle := float64(stdmath.Pi / 4)
+	e := NewDEulerAngles(angle, 0, 0)
+	want := DQuatFromAxisAngle(NewDVec3(1, 0, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestDEulerAnglesToQuatYawOnly(t *testing.T) {
+	angle := float64(stdmath.Pi / 3)
+	e := NewDEulerAngles(0, angle, 0)
+	want := DQuatFromAxisAngle(NewDVec3(0, 1, 0), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestDEulerAnglesToQuatRollOnly(t *testing.T) {
+	angle := float64(stdmath.Pi / 6)
+	e := NewDEulerAngles(0, 0, angle)
+	want := DQuatFromAxisAngle(NewDVec3(0, 0, 1), angle)
+	assert.True(t, e.ToQuat().ApproxEq(want, 1e-5))
+}
+
+func TestDEulerAnglesRoundTrip(t *testing.T) {
+	e := NewDEulerAngles(0.3, 0.5, 0.7)
+	got := DEulerAnglesFromQuat(e.ToQuat())
+	assert.True(t, got.ApproxEq(e, 1e-5))
+}
+
+func TestDEulerAnglesFromQuatIdentity(t *testing.T) {
+	got := DEulerAnglesFromQuat(DQuatIdentity())
+	assert.True(t, got.ApproxEq(NewDEulerAngles(0, 0, 0), 1e-6))
+}
+
+func TestDEulerAnglesEq(t *testing.T) {
+	a := NewDEulerAngles(1, 2, 3)
+	assert.True(t, a.Eq(NewDEulerAngles(1, 2, 3)))
+	assert.False(t, a.Eq(NewDEulerAngles(1, 2, 4)))
+}
+
+func TestDEulerAnglesApproxEq(t *testing.T) {
+	a := NewDEulerAngles(1.0, 2.0, 3.0)
+	b := NewDEulerAngles(1.0001, 2.0001, 3.0001)
+	assert.True(t, a.ApproxEq(b, 0.001))
+	assert.False(t, a.ApproxEq(b, 0.00001))
+}
+
+func TestDEulerAnglesJSON(t *testing.T) {
+	e := NewDEulerAngles(1, 2, 3)
+	data, err := e.MarshalJSON()
+	assert.Equal(t, nil, err)
+	var e2 DEulerAngles
+	err = e2.UnmarshalJSON(data)
+	assert.Equal(t, nil, err)
+	assert.True(t, e.Eq(e2))
+}
+
+func TestDEulerAnglesFloat32(t *testing.T) {
+	got := NewDEulerAngles(1, 2, 3).Float32()
+	assert.True(t, got.Eq(NewEulerAngles(1, 2, 3)))
+}
+
 // ensure stdmath import is used
 var _ = stdmath.Pi
