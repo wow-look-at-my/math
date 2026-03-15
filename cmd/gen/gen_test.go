@@ -247,6 +247,17 @@ func TestGenerateTests(t *testing.T) {
 	}))
 }
 
+func TestRun(t *testing.T) {
+	tmpDir := t.TempDir()
+	require.NoError(t, run(tmpDir))
+
+	// Spot-check a few generated files exist.
+	for _, name := range []string{"vec2.go", "mat3.go", "quat.go", "fvec2.go", "fmat3.go", "fquat.go", "dquat.go"} {
+		_, err := os.Stat(filepath.Join(tmpDir, name))
+		require.NoError(t, err, "expected %s to exist", name)
+	}
+}
+
 func TestGenerateBenchmarks(t *testing.T) {
 	dir := genDir()
 	tmpDir := t.TempDir()
