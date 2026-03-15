@@ -112,48 +112,50 @@ func generateFile(tmpl *template.Template, filename string, data interface{}) er
 	return nil
 }
 
-func run(outDir string) error {
+func main() {
 	dir := genDir()
 
-	parseTmpl := func(name string) *template.Template {
-		return template.Must(
-			template.New(name).Funcs(funcMap).ParseFiles(filepath.Join(dir, name)),
-		)
-	}
-
-	outPath := func(name string) string {
-		return filepath.Join(outDir, name)
-	}
-
-	vecTmpl := parseTmpl("tvec.go.tmpl")
-	matTmpl := parseTmpl("tmat.go.tmpl")
-	ivecTmpl := parseTmpl("ivec.go.tmpl")
-	imatTmpl := parseTmpl("imat.go.tmpl")
-	itestTmpl := parseTmpl("itest.go.tmpl")
-	quatTmpl := parseTmpl("tquat.go.tmpl")
+	vecTmpl := template.Must(
+		template.New("tvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tvec.go.tmpl")),
+	)
+	matTmpl := template.Must(
+		template.New("tmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tmat.go.tmpl")),
+	)
+	ivecTmpl := template.Must(
+		template.New("ivec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ivec.go.tmpl")),
+	)
+	imatTmpl := template.Must(
+		template.New("imat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "imat.go.tmpl")),
+	)
+	itestTmpl := template.Must(
+		template.New("itest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "itest.go.tmpl")),
+	)
 
 	// Generate generic types.
 	for _, n := range []int{2, 3, 4} {
-		if err := generateFile(vecTmpl, outPath(fmt.Sprintf("vec%d.go", n)), vecData{N: n}); err != nil {
-			return err
+		if err := generateFile(vecTmpl, fmt.Sprintf("vec%d.go", n), vecData{N: n}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 	}
 
 	for _, n := range []int{2, 3, 4} {
-		if err := generateFile(matTmpl, outPath(fmt.Sprintf("mat%d.go", n)), matData{N: n, N2: n * n}); err != nil {
-			return err
+		if err := generateFile(matTmpl, fmt.Sprintf("mat%d.go", n), matData{N: n, N2: n * n}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 	}
 
-	if err := generateFile(quatTmpl, outPath("quat.go"), nil); err != nil {
-		return err
-	}
-
 	// Generate floating-point concrete types (float32 and float64).
-	fvecTmpl := parseTmpl("fvec.go.tmpl")
-	fmatTmpl := parseTmpl("fmat.go.tmpl")
-	ftestTmpl := parseTmpl("ftest.go.tmpl")
-	fquatTmpl := parseTmpl("fquat.go.tmpl")
+	fvecTmpl := template.Must(
+		template.New("fvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fvec.go.tmpl")),
+	)
+	fmatTmpl := template.Must(
+		template.New("fmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fmat.go.tmpl")),
+	)
+	ftestTmpl := template.Must(
+		template.New("ftest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ftest.go.tmpl")),
+	)
 
 	floatTypes := []struct {
 		Prefix     string
@@ -166,36 +168,31 @@ func run(outDir string) error {
 
 	for _, ft := range floatTypes {
 		for _, n := range []int{2, 3, 4} {
-			if err := generateFile(fvecTmpl, outPath(fmt.Sprintf("%svec%d.go", ft.FilePrefix, n)), ivecData{
+			if err := generateFile(fvecTmpl, fmt.Sprintf("%svec%d.go", ft.FilePrefix, n), ivecData{
 				N:        n,
 				Prefix:   ft.Prefix,
 				ElemType: ft.ElemType,
 			}); err != nil {
-				return err
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
 			}
-			if err := generateFile(fmatTmpl, outPath(fmt.Sprintf("%smat%d.go", ft.FilePrefix, n)), imatData{
+			if err := generateFile(fmatTmpl, fmt.Sprintf("%smat%d.go", ft.FilePrefix, n), imatData{
 				N:        n,
 				N2:       n * n,
 				Prefix:   ft.Prefix,
 				ElemType: ft.ElemType,
 			}); err != nil {
-				return err
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
 			}
 		}
 
-		if err := generateFile(fquatTmpl, outPath(fmt.Sprintf("%squat.go", ft.FilePrefix)), ivecData{
-			N:        4,
+		if err := generateFile(ftestTmpl, fmt.Sprintf("%s_test.go", ft.FilePrefix), itestData{
 			Prefix:   ft.Prefix,
 			ElemType: ft.ElemType,
 		}); err != nil {
-			return err
-		}
-
-		if err := generateFile(ftestTmpl, outPath(fmt.Sprintf("%s_test.go", ft.FilePrefix)), itestData{
-			Prefix:   ft.Prefix,
-			ElemType: ft.ElemType,
-		}); err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 	}
 
@@ -218,36 +215,41 @@ func run(outDir string) error {
 	for _, it := range intTypes {
 		prefix := strings.ToLower(it.Prefix)
 		for _, n := range []int{2, 3, 4} {
-			if err := generateFile(ivecTmpl, outPath(fmt.Sprintf("%svec%d.go", prefix, n)), ivecData{
+			if err := generateFile(ivecTmpl, fmt.Sprintf("%svec%d.go", prefix, n), ivecData{
 				N:        n,
 				Prefix:   it.Prefix,
 				ElemType: it.GoType,
 			}); err != nil {
-				return err
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
 			}
 
-			if err := generateFile(imatTmpl, outPath(fmt.Sprintf("%smat%d.go", prefix, n)), imatData{
+			if err := generateFile(imatTmpl, fmt.Sprintf("%smat%d.go", prefix, n), imatData{
 				N:        n,
 				N2:       n * n,
 				Prefix:   it.Prefix,
 				ElemType: it.GoType,
 			}); err != nil {
-				return err
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
 			}
 		}
 
 		// Generate test file for this integer type.
-		if err := generateFile(itestTmpl, outPath(fmt.Sprintf("%s_test.go", prefix)), itestData{
+		if err := generateFile(itestTmpl, fmt.Sprintf("%s_test.go", prefix), itestData{
 			Prefix:   it.Prefix,
 			ElemType: it.GoType,
 			Signed:   it.Signed,
 		}); err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 	}
 
 	// Generate benchmark files.
-	benchTmpl := parseTmpl("bench.go.tmpl")
+	benchTmpl := template.Must(
+		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
+	)
 
 	benchTypes := []benchData{
 		{Name: "F32", Prefix: "", ElemType: "float32", LenType: "float32", LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true, HasFloat32: false, HasMat3: true, Epsilon: "1e-6"},
@@ -263,17 +265,9 @@ func run(outDir string) error {
 
 	for _, bt := range benchTypes {
 		filename := strings.ToLower(bt.Name) + "_bench_test.go"
-		if err := generateFile(benchTmpl, outPath(filename), bt); err != nil {
-			return err
+		if err := generateFile(benchTmpl, filename, bt); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
-	}
-
-	return nil
-}
-
-func main() {
-	if err := run("."); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
 	}
 }
