@@ -5,12 +5,18 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Clear stale build cache
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh cache delete go-build --repo ${{ github.repository }} || true
 
       - uses: wow-look-at-my/go-toolchain@latest
         with:
