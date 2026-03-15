@@ -3,19 +3,17 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"text/template"
+
+	"github.com/wow-look-at-my/testify/require"
 )
 
 func TestGenDir(t *testing.T) {
 	dir := genDir()
-	if dir == "" {
-		t.Fatal("genDir returned empty string")
-	}
-	if _, err := os.Stat(filepath.Join(dir, "tvec.go.tmpl")); err != nil {
-		t.Fatalf("genDir does not contain expected template files: %v", err)
-	}
+	require.NotEqual(t, "", dir)
+	_, err := os.Stat(filepath.Join(dir, "tvec.go.tmpl"))
+	require.NoError(t, err)
 }
 
 func TestGenerateFile(t *testing.T) {
@@ -23,38 +21,26 @@ func TestGenerateFile(t *testing.T) {
 
 	outFile := filepath.Join(t.TempDir(), "test.go")
 
-	if err := generateFile(tmpl, outFile, struct{ N int }{N: 42}); err != nil {
-		t.Fatalf("generateFile failed: %v", err)
-	}
+	require.NoError(t, generateFile(tmpl, outFile, struct{ N int }{N: 42}))
 
 	data, err := os.ReadFile(outFile)
-	if err != nil {
-		t.Fatalf("reading generated file: %v", err)
-	}
-	if !strings.Contains(string(data), "var x = 42") {
-		t.Fatalf("generated file does not contain expected content: %s", data)
-	}
+	require.NoError(t, err)
+	require.Contains(t, string(data), "var x = 42")
 }
 
 func TestGenerateFileFormatError(t *testing.T) {
 	tmpl := template.Must(template.New("test").Parse("not valid go {{.N}}\n"))
 
 	err := generateFile(tmpl, filepath.Join(t.TempDir(), "test.go"), struct{ N int }{N: 42})
-	if err == nil {
-		t.Fatal("expected error for invalid go source")
-	}
+	require.Error(t, err)
 }
 
 func TestFuncMapSeq(t *testing.T) {
 	fn := funcMap["seq"].(func(int) []int)
 	got := fn(4)
-	if len(got) != 4 {
-		t.Fatalf("seq(4) returned %d elements", len(got))
-	}
+	require.Equal(t, 4, len(got))
 	for i, v := range got {
-		if v != i {
-			t.Fatalf("seq(4)[%d] = %d", i, v)
-		}
+		require.Equal(t, i, v)
 	}
 }
 
@@ -62,9 +48,7 @@ func TestFuncMapComponent(t *testing.T) {
 	fn := funcMap["component"].(func(int) string)
 	expected := []string{"X", "Y", "Z", "W"}
 	for i, want := range expected {
-		if got := fn(i); got != want {
-			t.Fatalf("component(%d) = %q, want %q", i, got, want)
-		}
+		require.Equal(t, want, fn(i))
 	}
 }
 
@@ -72,9 +56,7 @@ func TestFuncMapParam(t *testing.T) {
 	fn := funcMap["param"].(func(int) string)
 	expected := []string{"x", "y", "z", "w"}
 	for i, want := range expected {
-		if got := fn(i); got != want {
-			t.Fatalf("param(%d) = %q, want %q", i, got, want)
-		}
+		require.Equal(t, want, fn(i))
 	}
 }
 
@@ -83,48 +65,28 @@ func TestFuncMapArithmetic(t *testing.T) {
 	sub := funcMap["sub"].(func(int, int) int)
 	mul := funcMap["mul"].(func(int, int) int)
 
-	if got := add(3, 4); got != 7 {
-		t.Fatalf("add(3,4) = %d", got)
-	}
-	if got := sub(10, 3); got != 7 {
-		t.Fatalf("sub(10,3) = %d", got)
-	}
-	if got := mul(3, 4); got != 12 {
-		t.Fatalf("mul(3,4) = %d", got)
-	}
+	require.Equal(t, 7, add(3, 4))
+	require.Equal(t, 7, sub(10, 3))
+	require.Equal(t, 12, mul(3, 4))
 }
 
 func TestFuncMapLast(t *testing.T) {
 	fn := funcMap["last"].(func(int, int) bool)
-	if !fn(3, 4) {
-		t.Fatal("last(3,4) should be true")
-	}
-	if fn(2, 4) {
-		t.Fatal("last(2,4) should be false")
-	}
+	require.True(t, fn(3, 4))
+	require.False(t, fn(2, 4))
 }
 
 func TestFuncMapIntList(t *testing.T) {
 	fn := funcMap["intList"].(func(int, int) string)
-	if got := fn(3, 1); got != "1, 2, 3" {
-		t.Fatalf("intList(3,1) = %q", got)
-	}
+	require.Equal(t, "1, 2, 3", fn(3, 1))
 }
 
 func TestFuncMapInvMat(t *testing.T) {
 	fn := funcMap["invMat"].(func(int) string)
-	if got := fn(2); got != "1, 2, 3, 4" {
-		t.Fatalf("invMat(2) = %q", got)
-	}
-	if got := fn(3); got != "1, 2, 3, 0, 1, 4, 5, 6, 0" {
-		t.Fatalf("invMat(3) = %q", got)
-	}
-	if got := fn(4); got != "1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1" {
-		t.Fatalf("invMat(4) = %q", got)
-	}
-	if got := fn(5); got != "" {
-		t.Fatalf("invMat(5) = %q", got)
-	}
+	require.Equal(t, "1, 2, 3, 4", fn(2))
+	require.Equal(t, "1, 2, 3, 0, 1, 4, 5, 6, 0", fn(3))
+	require.Equal(t, "1, 0, 0, 1, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1", fn(4))
+	require.Equal(t, "", fn(5))
 }
 
 func TestTemplatesParse(t *testing.T) {
@@ -139,9 +101,7 @@ func TestTemplatesParse(t *testing.T) {
 	for _, name := range templates {
 		t.Run(name, func(t *testing.T) {
 			_, err := template.New(name).Funcs(funcMap).ParseFiles(filepath.Join(dir, name))
-			if err != nil {
-				t.Fatalf("failed to parse template %s: %v", name, err)
-			}
+			require.NoError(t, err)
 		})
 	}
 }
@@ -154,17 +114,11 @@ func TestGenerateVec(t *testing.T) {
 		template.New("tvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tvec.go.tmpl")),
 	)
 	outFile := filepath.Join(tmpDir, "vec2.go")
-	if err := generateFile(vecTmpl, outFile, vecData{N: 2}); err != nil {
-		t.Fatalf("failed to generate vec2.go: %v", err)
-	}
+	require.NoError(t, generateFile(vecTmpl, outFile, vecData{N: 2}))
 
 	data, err := os.ReadFile(outFile)
-	if err != nil {
-		t.Fatalf("reading generated file: %v", err)
-	}
-	if !strings.Contains(string(data), "TVec2") {
-		t.Fatal("generated vec2.go does not contain TVec2")
-	}
+	require.NoError(t, err)
+	require.Contains(t, string(data), "TVec2")
 }
 
 func TestGenerateMat(t *testing.T) {
@@ -175,17 +129,11 @@ func TestGenerateMat(t *testing.T) {
 		template.New("tmat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tmat.go.tmpl")),
 	)
 	outFile := filepath.Join(tmpDir, "mat3.go")
-	if err := generateFile(matTmpl, outFile, matData{N: 3, N2: 9}); err != nil {
-		t.Fatalf("failed to generate mat3.go: %v", err)
-	}
+	require.NoError(t, generateFile(matTmpl, outFile, matData{N: 3, N2: 9}))
 
 	data, err := os.ReadFile(outFile)
-	if err != nil {
-		t.Fatalf("reading generated file: %v", err)
-	}
-	if !strings.Contains(string(data), "TMat3") {
-		t.Fatal("generated mat3.go does not contain TMat3")
-	}
+	require.NoError(t, err)
+	require.Contains(t, string(data), "TMat3")
 }
 
 func TestGenerateQuat(t *testing.T) {
@@ -196,17 +144,11 @@ func TestGenerateQuat(t *testing.T) {
 		template.New("tquat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tquat.go.tmpl")),
 	)
 	outFile := filepath.Join(tmpDir, "quat.go")
-	if err := generateFile(quatTmpl, outFile, nil); err != nil {
-		t.Fatalf("failed to generate quat.go: %v", err)
-	}
+	require.NoError(t, generateFile(quatTmpl, outFile, nil))
 
 	data, err := os.ReadFile(outFile)
-	if err != nil {
-		t.Fatalf("reading generated file: %v", err)
-	}
-	if !strings.Contains(string(data), "TQuat") {
-		t.Fatal("generated quat.go does not contain TQuat")
-	}
+	require.NoError(t, err)
+	require.Contains(t, string(data), "TQuat")
 }
 
 func TestGenerateConcreteFloatTypes(t *testing.T) {
@@ -235,26 +177,20 @@ func TestGenerateConcreteFloatTypes(t *testing.T) {
 	for _, ft := range floatTypes {
 		for _, n := range []int{2, 3, 4} {
 			outFile := filepath.Join(tmpDir, ft.FilePrefix+"vec.go")
-			if err := generateFile(fvecTmpl, outFile, ivecData{
+			require.NoError(t, generateFile(fvecTmpl, outFile, ivecData{
 				N: n, Prefix: ft.Prefix, ElemType: ft.ElemType,
-			}); err != nil {
-				t.Fatalf("failed to generate %svec%d.go: %v", ft.FilePrefix, n, err)
-			}
+			}))
 
 			outFile = filepath.Join(tmpDir, ft.FilePrefix+"mat.go")
-			if err := generateFile(fmatTmpl, outFile, imatData{
+			require.NoError(t, generateFile(fmatTmpl, outFile, imatData{
 				N: n, N2: n * n, Prefix: ft.Prefix, ElemType: ft.ElemType,
-			}); err != nil {
-				t.Fatalf("failed to generate %smat%d.go: %v", ft.FilePrefix, n, err)
-			}
+			}))
 		}
 
 		outFile := filepath.Join(tmpDir, ft.FilePrefix+"quat.go")
-		if err := generateFile(fquatTmpl, outFile, ivecData{
+		require.NoError(t, generateFile(fquatTmpl, outFile, ivecData{
 			N: 4, Prefix: ft.Prefix, ElemType: ft.ElemType,
-		}); err != nil {
-			t.Fatalf("failed to generate %squat.go: %v", ft.FilePrefix, err)
-		}
+		}))
 	}
 }
 
@@ -279,18 +215,14 @@ func TestGenerateIntegerTypes(t *testing.T) {
 
 	for _, it := range intTypes {
 		outFile := filepath.Join(tmpDir, "vec.go")
-		if err := generateFile(ivecTmpl, outFile, ivecData{
+		require.NoError(t, generateFile(ivecTmpl, outFile, ivecData{
 			N: 3, Prefix: it.Prefix, ElemType: it.GoType,
-		}); err != nil {
-			t.Fatalf("failed to generate %s vec3: %v", it.Prefix, err)
-		}
+		}))
 
 		outFile = filepath.Join(tmpDir, "mat.go")
-		if err := generateFile(imatTmpl, outFile, imatData{
+		require.NoError(t, generateFile(imatTmpl, outFile, imatData{
 			N: 3, N2: 9, Prefix: it.Prefix, ElemType: it.GoType,
-		}); err != nil {
-			t.Fatalf("failed to generate %s mat3: %v", it.Prefix, err)
-		}
+		}))
 	}
 }
 
@@ -302,21 +234,17 @@ func TestGenerateTests(t *testing.T) {
 		template.New("ftest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ftest.go.tmpl")),
 	)
 	outFile := filepath.Join(tmpDir, "f_test.go")
-	if err := generateFile(ftestTmpl, outFile, itestData{
+	require.NoError(t, generateFile(ftestTmpl, outFile, itestData{
 		Prefix: "", ElemType: "float32",
-	}); err != nil {
-		t.Fatalf("failed to generate f_test.go: %v", err)
-	}
+	}))
 
 	itestTmpl := template.Must(
 		template.New("itest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "itest.go.tmpl")),
 	)
 	outFile = filepath.Join(tmpDir, "i32_test.go")
-	if err := generateFile(itestTmpl, outFile, itestData{
+	require.NoError(t, generateFile(itestTmpl, outFile, itestData{
 		Prefix: "I32", ElemType: "int32", Signed: true,
-	}); err != nil {
-		t.Fatalf("failed to generate i32_test.go: %v", err)
-	}
+	}))
 }
 
 func TestGenerateBenchmarks(t *testing.T) {
@@ -327,11 +255,9 @@ func TestGenerateBenchmarks(t *testing.T) {
 		template.New("bench.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "bench.go.tmpl")),
 	)
 	outFile := filepath.Join(tmpDir, "f32_bench_test.go")
-	if err := generateFile(benchTmpl, outFile, benchData{
+	require.NoError(t, generateFile(benchTmpl, outFile, benchData{
 		Name: "F32", Prefix: "", ElemType: "float32", LenType: "float32",
 		LerpT: "0.5", HasVecApproxEq: true, HasMatApproxEq: true,
 		HasFloat32: false, HasMat3: true, Epsilon: "1e-6",
-	}); err != nil {
-		t.Fatalf("failed to generate f32_bench_test.go: %v", err)
-	}
+	}))
 }
