@@ -131,6 +131,10 @@ func main() {
 		template.New("itest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "itest.go.tmpl")),
 	)
 
+	quatTmpl := template.Must(
+		template.New("tquat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "tquat.go.tmpl")),
+	)
+
 	// Generate generic types.
 	for _, n := range []int{2, 3, 4} {
 		if err := generateFile(vecTmpl, fmt.Sprintf("vec%d.go", n), vecData{N: n}); err != nil {
@@ -146,6 +150,11 @@ func main() {
 		}
 	}
 
+	if err := generateFile(quatTmpl, "quat.go", nil); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Generate floating-point concrete types (float32 and float64).
 	fvecTmpl := template.Must(
 		template.New("fvec.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fvec.go.tmpl")),
@@ -155,6 +164,9 @@ func main() {
 	)
 	ftestTmpl := template.Must(
 		template.New("ftest.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "ftest.go.tmpl")),
+	)
+	fquatTmpl := template.Must(
+		template.New("fquat.go.tmpl").Funcs(funcMap).ParseFiles(filepath.Join(dir, "fquat.go.tmpl")),
 	)
 
 	floatTypes := []struct {
@@ -185,6 +197,15 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				os.Exit(1)
 			}
+		}
+
+		if err := generateFile(fquatTmpl, fmt.Sprintf("%squat.go", ft.FilePrefix), ivecData{
+			N:        4,
+			Prefix:   ft.Prefix,
+			ElemType: ft.ElemType,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
 		}
 
 		if err := generateFile(ftestTmpl, fmt.Sprintf("%s_test.go", ft.FilePrefix), itestData{
